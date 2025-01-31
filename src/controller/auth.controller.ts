@@ -1,13 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import IAuthController from "../interfaces/controllers/IAuthController.interface";
 import StatusCodes from "../constants/auth/statusCodes";
-import { ILoginCredentials, IRegisterationCredentials } from "../entity/IUser.entity";
+import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/IUser.entity";
 import IAuthUseCase from "../interfaces/usecase/IAuth.usecase.interface";
 import SuccessMessage from "../constants/auth/successMessage";
 import IAuthRequest from "../interfaces/common/IAuthRequest.interface";
-
-import ErrorMessage from "../constants/auth/errorMessage";
-import { ErrorCode } from "../constants/auth/errorCode";
 
 export default class AuthController implements IAuthController {
 
@@ -145,6 +142,26 @@ export default class AuthController implements IAuthController {
       });
 
     }catch(error){
+      next(error);
+    }
+
+  }
+
+  async getUserDetails(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
+
+    try {
+
+      console.log(req.id);
+      
+
+      const userData: IUser | null = await this.authUsecase.getUSerdetails(req.id!);
+
+      res.status(StatusCodes.Success).json({
+        message: SuccessMessage.SUCESSFULL,
+        userData
+      });
+
+    } catch (error) {
       next(error);
     }
 

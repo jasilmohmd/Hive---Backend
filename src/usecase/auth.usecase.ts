@@ -287,4 +287,10 @@ export default class AuthUsecase implements IAuthUseCase {
 
   }
 
+  async getUSerdetails(id: string): Promise<IUser| never | null>{
+    const userData = this.authRepository.getUserDetails(id);
+
+    return userData;
+  }
+
 }

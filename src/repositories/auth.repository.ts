@@ -86,6 +86,25 @@ export default class AuthRepository implements IAuthRepository {
     }
   }
 
+  async getUserDetails(userId: string): Promise<IUser | never>{
+
+    try{
+
+       // Use lean() to return a plain JavaScript object matching IUser
+       const user = await Users.findOne({ _id: userId }).lean<IUser>();
+
+       if (!user) {
+         throw new Error(`User with ID ${userId} not found`);
+       }
+ 
+       return user; // Type now matches IUser
+
+    }catch(error){
+      throw error
+    }
+
+  }
+
 
   async updatePassword(userId: string, hashedPassword: string): Promise<Document | null> {
     try {

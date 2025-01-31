@@ -10,7 +10,6 @@ const app: Express = express();
 const CORS_ORIGIN: string = process.env.CORS_ORIGIN ?? "http://localhost:4200";
 
 import authRouter from "../router/auth.router";
-import userRouter from "../router/user.router";
 import errorHandlerMiddleware from "../middlewares/error.middleware";
 
 // Middlewares
@@ -24,7 +23,6 @@ app.use(cookieParser()); // Parse cookies in request headers
 app.use(morgan("dev")); // Loging all http requests in detail
 
 app.use("/auth", authRouter); // auth router
-app.use("/user", userRouter) // user router
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);

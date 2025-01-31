@@ -1,4 +1,4 @@
-import { ILoginCredentials, IRegisterationCredentials } from "../../entity/IUser.entity";
+import IUser, { ILoginCredentials, IRegisterationCredentials } from "../../entity/IUser.entity";
 
 export default interface IAuthUseCase {
   handleUserRegister(data:IRegisterationCredentials):Promise<string|never>;
@@ -7,4 +7,5 @@ export default interface IAuthUseCase {
   sendVerificationOTP(email: string, mode: string): Promise<void | never>;
   verifyOTP(email: string, otp: string): Promise<boolean>
   setNewPassword(email: string, newPassword: string, confirmPassword: string): Promise<void>
+  getUSerdetails(email: string): Promise<IUser| never | null>
 }

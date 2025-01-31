@@ -39,5 +39,7 @@ authRouter.route("/send-otp").post(authController.sendVerificationOTP.bind(authC
 authRouter.route("/otp_verify").post(authController.verifyOTP.bind(authController));
 
 authRouter.route("/set_new_password").post(authController.setNewPassword.bind(authController));
+
+authRouter.route("/details").get(authMiddleware.isAuthenticated.bind(authMiddleware), authController.getUserDetails.bind(authController))
  
 export default authRouter;
