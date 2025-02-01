@@ -22,5 +22,6 @@ export const ErrorCode = Object.freeze({
   UNAUTHORIZED_ACCESS: "401x2",
   USER_ALREADY_LOGGED_IN: "400x17",
   INTERNAL_SERVER_ERROR: "500x1",
+  INVALID_INPUT: "400x18",
   UNKNOWN_ERROR: "500x2"
 });

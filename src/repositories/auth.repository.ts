@@ -78,6 +78,17 @@ export default class AuthRepository implements IAuthRepository {
 
   }
 
+  async updateUserStatus(userId: string, status: "online" | "offline"): Promise<void> {
+    try{
+
+      await Users.updateOne({ _id: userId }, { $set: { status } });
+
+    }catch(error){
+      throw error;
+    }
+    
+  }
+
   async getUserDataByEmail(email: string): Promise<IUser | null | never> {
     try {
       return await Users.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });

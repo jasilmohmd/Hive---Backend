@@ -19,7 +19,8 @@ const ErrorMessage = Object.freeze({
   UNAUTHORIZED_ACCESS: "Unauthorized access. Please login again.",
   EMAIL_VERIFICATION_FAILED: "Email verification failed. Please try again.",
   OTP_VERIFICATION_FAILED: "OTP verification failed. Please check the OTP and try again.",
-  UNKNOWN_ERROR: "An unknown error occurred."
+  UNKNOWN_ERROR: "An unknown error occurred.",
+  INVALID_USER_ID: "Invalid user ID format"
 });
 
 export default ErrorMessage;

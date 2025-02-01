@@ -79,15 +79,15 @@ export default class AuthUsecase implements IAuthUseCase {
       const newUSerData: Omit<IUser, "_id"> = {
         userName: data.userName,
         email: data.email.toLowerCase(),
-        password: await this.hashingService.hash(data.password)
+        password: await this.hashingService.hash(data.password),
+        friends: [],
+        friendRequests: [],
+        status: "offline" // Default status is offline when a user is created
       }
 
       const newUSer: IUser = await this.authRepository.createUser(newUSerData);
 
-      const payload: IPayload = {
-        id: newUSer._id
-      }
-
+      const payload: IPayload = { id: newUSer._id }
       const token: string = this.JWTService.sign(payload, "1d");
 
       return token
@@ -103,7 +103,10 @@ export default class AuthUsecase implements IAuthUseCase {
   async handleUserLogin(data: ILoginCredentials): Promise<string | never> {
     try {
 
-      if (!data.email || !data.password) throw new RequiredCredentialsNotGiven(ErrorMessage.REQUIRED_CREDENTIALS_NOT_GIVEN, ErrorCode.CREDENTIALS_NOT_GIVEN_OR_NOT_FOUND);
+      if (!data.email || !data.password) throw new RequiredCredentialsNotGiven(
+        ErrorMessage.REQUIRED_CREDENTIALS_NOT_GIVEN,
+        ErrorCode.CREDENTIALS_NOT_GIVEN_OR_NOT_FOUND
+      );
 
       if (!(/^[A-Za-z0-9]+@gmail\.com$/).test(data.email)) {
         throw new ValidationError({
@@ -138,12 +141,47 @@ export default class AuthUsecase implements IAuthUseCase {
 
       const token: string = this.JWTService.sign(payload, "1d");
 
+      // 🔹 Update user status to "online"
+      await this.authRepository.updateUserStatus(userData._id, "online");
+
       return token;
 
     } catch (error) {
       throw error;
     }
   }
+
+
+  async handleUserLogout(userId: string): Promise<void> {
+    try {
+
+      if (!isObjectIdOrHexString(userId)) {
+        throw new ValidationError({
+          statusCode: StatusCodes.BadRequest,
+          errorField: ErrorField.USER,
+          message: "Invalid user ID format",
+          errorCode: ErrorCode.INVALID_INPUT
+        });
+      }
+
+      const user = await this.authRepository.getUserDetails(userId);
+      if (!user) {
+        throw new ValidationError({
+          statusCode: StatusCodes.NotFound,
+          errorField: ErrorField.USER,
+          message: "User not found",
+          errorCode: ErrorCode.USER_NOT_FOUND
+        });
+      }
+
+      // 🔹 Update user status to offline in the repository
+      await this.authRepository.updateUserStatus(userId, "offline");
+
+    } catch (error) {
+      throw error
+    }
+  }
+
 
   async isUserAuthenticated(token: string | undefined): Promise<void | never> {
     try {
@@ -214,7 +252,7 @@ export default class AuthUsecase implements IAuthUseCase {
     try {
       const otp = this.generateOTP();
       // Store OTP and mode in the database
-    await this.authRepository.saveOTP(email, otp, mode); // Store OTP in db
+      await this.authRepository.saveOTP(email, otp, mode); // Store OTP in db
       await this.sendEmailOTP(email, otp); // Send OTP via email
     } catch (error) {
       throw error
@@ -225,25 +263,25 @@ export default class AuthUsecase implements IAuthUseCase {
     try {
       const otpRecord = await OTPModel.findOne({ email });
 
-    if (!otpRecord || otpRecord.otp !== otp) {
-      throw new ValidationError({
-        statusCode: StatusCodes.BadRequest,
-        errorField: ErrorField.OTP,
-        message: ErrorMessage.OTP_INCORRECT,
-        errorCode: ErrorCode.OTP_INCORRECT
-      });
-    }
+      if (!otpRecord || otpRecord.otp !== otp) {
+        throw new ValidationError({
+          statusCode: StatusCodes.BadRequest,
+          errorField: ErrorField.OTP,
+          message: ErrorMessage.OTP_INCORRECT,
+          errorCode: ErrorCode.OTP_INCORRECT
+        });
+      }
 
-    if (otpRecord.otpExpiresAt < new Date()) {
-      throw new ValidationError({
-        statusCode: StatusCodes.BadRequest,
-        errorField: ErrorField.OTP,
-        message: ErrorMessage.OTP_EXPIRED,
-        errorCode: ErrorCode.OTP_EXPIRED
-      });
-    }
+      if (otpRecord.otpExpiresAt < new Date()) {
+        throw new ValidationError({
+          statusCode: StatusCodes.BadRequest,
+          errorField: ErrorField.OTP,
+          message: ErrorMessage.OTP_EXPIRED,
+          errorCode: ErrorCode.OTP_EXPIRED
+        });
+      }
 
-    await this.authRepository.clearOTP(email); // Remove OTP after verification
+      await this.authRepository.clearOTP(email); // Remove OTP after verification
 
       return true; // Return true on successful verification
 
@@ -287,8 +325,10 @@ export default class AuthUsecase implements IAuthUseCase {
 
   }
 
-  async getUSerdetails(id: string): Promise<IUser| never | null>{
-    const userData = this.authRepository.getUserDetails(id);
+  async getUSerdetails(id: string): Promise<IUser | never | null> {
+    const userData = await this.authRepository.getUserDetails(id);
+    // console.log(userData.status);
+    
 
     return userData;
   }

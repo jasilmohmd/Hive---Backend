@@ -5,6 +5,10 @@ import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/I
 import IAuthUseCase from "../interfaces/usecase/IAuth.usecase.interface";
 import SuccessMessage from "../constants/auth/successMessage";
 import IAuthRequest from "../interfaces/common/IAuthRequest.interface";
+import { ErrorField } from "../constants/auth/errorField";
+import { ErrorCode } from "../constants/auth/errorCode";
+import ValidationError from "../errors/validationError.error";
+import ErrorMessage from "../constants/auth/errorMessage";
 
 export default class AuthController implements IAuthController {
 
@@ -104,13 +108,28 @@ export default class AuthController implements IAuthController {
 
   async logoutUser(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.id; // Assuming user ID is extracted from the request
+  
+      
+      if (!userId) {
+        throw new ValidationError({
+          statusCode: StatusCodes.Unauthorized,
+          errorField: ErrorField.USER,
+          message: ErrorMessage.UNAUTHORIZED_ACCESS,
+          errorCode: ErrorCode.UNAUTHORIZED_ACCESS,
+        });
+      }
+      
+      await this.authUsecase.handleUserLogout(userId);
+      
+      // 🔹 Clear the authentication token
       res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === "production",
       });
-
+  
       res.status(StatusCodes.Success).json({
-        message: SuccessMessage.LOGOUT_SUCCESS
+        message: SuccessMessage.LOGOUT_SUCCESS,
       });
     } catch (error: any) {
       next(error);
