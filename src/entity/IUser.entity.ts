@@ -11,7 +11,10 @@ export default interface IUser {
   email: string;
   password: string;
   friends: string[]; // Array of user IDs
-  friendRequests: string[]; // Array of user IDs
+  friendRequests: {
+    sender: string;
+    status: "pending" | "accepted" | "rejected";
+  }[]; // Array of user IDs
   status: "online" | "offline"; // User status
 }
 

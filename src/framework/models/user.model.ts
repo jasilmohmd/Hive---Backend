@@ -20,14 +20,23 @@ const userSchema: Schema = new Schema<IUser>({
     ref: "Users"
   }],
   friendRequests: [{
-    sender: { type: Types.ObjectId, ref: "Users" },
-    status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" }
+    sender: {
+      type: Types.ObjectId,
+      ref: "Users",
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending"
+    }
   }],
   status: {
     type: String,
-    required: true
+    enum: ["online", "offline"],
+    default: "offline"
   }
-  
+
 });
 
 const Users = mongoose.model<IUser>('Users', userSchema);
