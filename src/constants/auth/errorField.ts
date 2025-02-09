@@ -1,6 +1,7 @@
 export const ErrorField = Object.freeze({
   USER: "user",
   EMAIL: "email",
+  FRIEND_REQUEST: "FRIEND_REQUEST",
   PASSWORD_AND_CONFIRM_PASSWORD: "confirmPassword",
   PASSWORD: "password",
   USERNAME: "userName",

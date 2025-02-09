@@ -82,7 +82,8 @@ export default class AuthUsecase implements IAuthUseCase {
         password: await this.hashingService.hash(data.password),
         friends: [],
         friendRequests: [],
-        status: "offline" // Default status is offline when a user is created
+        status: "offline", // Default status is offline when a user is created
+        blocked: []
       }
 
       const newUSer: IUser = await this.authRepository.createUser(newUSerData);

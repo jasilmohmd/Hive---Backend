@@ -20,7 +20,11 @@ const ErrorMessage = Object.freeze({
   EMAIL_VERIFICATION_FAILED: "Email verification failed. Please try again.",
   OTP_VERIFICATION_FAILED: "OTP verification failed. Please check the OTP and try again.",
   UNKNOWN_ERROR: "An unknown error occurred.",
-  INVALID_USER_ID: "Invalid user ID format"
+  INVALID_USER_ID: "Invalid user ID format",
+
+  FRIEND_REQUEST_PENDING: "Friend request already sent.",
+  ALREADY_FRIENDS: "You are already friends.",
+  CANNOT_FRIEND_SELF: "You cannot send a friend request to yourself"
 });
 
 export default ErrorMessage;
