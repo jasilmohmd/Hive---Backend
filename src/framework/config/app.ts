@@ -11,6 +11,7 @@ const CORS_ORIGIN: string = process.env.CORS_ORIGIN ?? "http://localhost:4200";
 
 import authRouter from "../router/auth.router";
 import errorHandlerMiddleware from "../middlewares/error.middleware";
+import friendRouter from "../router/friends.router";
 
 // Middlewares
 app.use(cors({
@@ -23,6 +24,7 @@ app.use(cookieParser()); // Parse cookies in request headers
 app.use(morgan("dev")); // Loging all http requests in detail
 
 app.use("/auth", authRouter); // auth router
+app.use("/friends", friendRouter); // friend router
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);

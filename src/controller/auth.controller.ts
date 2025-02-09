@@ -169,11 +169,27 @@ export default class AuthController implements IAuthController {
   async getUserDetails(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
 
     try {
-
-      console.log(req.id);
-      
-
+    
       const userData: IUser | null = await this.authUsecase.getUSerdetails(req.id!);
+
+      res.status(StatusCodes.Success).json({
+        message: SuccessMessage.SUCESSFULL,
+        userData
+      });
+
+    } catch (error) {
+      next(error);
+    }
+
+  }
+
+  async getUserDetailsById(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+    try {
+
+      const userId = req.params.id
+    
+      const userData: IUser | null = await this.authUsecase.getUSerdetails(userId);
 
       res.status(StatusCodes.Success).json({
         message: SuccessMessage.SUCESSFULL,

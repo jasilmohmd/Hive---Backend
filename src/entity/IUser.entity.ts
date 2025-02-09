@@ -16,6 +16,7 @@ export default interface IUser {
     status: "pending" | "accepted" | "rejected";
   }[]; // Array of user IDs
   status: "online" | "offline"; // User status
+  blocked: string[];
 }
 
 

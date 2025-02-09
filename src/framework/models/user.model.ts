@@ -35,7 +35,11 @@ const userSchema: Schema = new Schema<IUser>({
     type: String,
     enum: ["online", "offline"],
     default: "offline"
-  }
+  },
+  blocked: [{
+    type: Types.ObjectId,
+    ref: "Users"
+  }]
 
 });
 
