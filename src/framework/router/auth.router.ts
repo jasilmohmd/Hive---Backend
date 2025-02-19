@@ -1,6 +1,6 @@
 import { Router } from "express";
 import AuthController from "../../controller/auth.controller";
-import IAuthController from "../../interfaces/controllers/IAuthController.interface";
+import IAuthController from "../../interfaces/controllers/IAuth.controller.interface";
 import IAuthUseCase from "../../interfaces/usecase/IAuth.usecase.interface";
 import AuthUsecase from "../../usecase/auth.usecase";
 import IAuthRepository from "../../interfaces/repository/IAuth.repository.interface";

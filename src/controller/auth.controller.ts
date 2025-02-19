@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import IAuthController from "../interfaces/controllers/IAuthController.interface";
+import IAuthController from "../interfaces/controllers/IAuth.controller.interface";
 import StatusCodes from "../constants/auth/statusCodes";
 import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/IUser.entity";
 import IAuthUseCase from "../interfaces/usecase/IAuth.usecase.interface";

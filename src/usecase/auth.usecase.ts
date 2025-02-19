@@ -35,7 +35,7 @@ export default class AuthUsecase implements IAuthUseCase {
         throw new RequiredCredentialsNotGiven(ErrorMessage.REQUIRED_CREDENTIALS_NOT_GIVEN, ErrorCode.CREDENTIALS_NOT_GIVEN_OR_NOT_FOUND);
       }
 
-      if (!(/^[A-Za-z0-9]+@gmail\.com$/).test(data.email)) {
+      if (!(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/).test(data.email)) {
         throw new ValidationError({
           statusCode: StatusCodes.BadRequest,
           errorField: ErrorField.EMAIL,
@@ -82,7 +82,7 @@ export default class AuthUsecase implements IAuthUseCase {
         password: await this.hashingService.hash(data.password),
         friends: [],
         friendRequests: [],
-        status: "offline", // Default status is offline when a user is created
+        status: "online", // Default status is offline when a user is created
         blocked: []
       }
 
@@ -109,7 +109,7 @@ export default class AuthUsecase implements IAuthUseCase {
         ErrorCode.CREDENTIALS_NOT_GIVEN_OR_NOT_FOUND
       );
 
-      if (!(/^[A-Za-z0-9]+@gmail\.com$/).test(data.email)) {
+      if (!(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/).test(data.email)) {
         throw new ValidationError({
           statusCode: StatusCodes.BadRequest,
           errorField: ErrorField.EMAIL,
@@ -329,7 +329,7 @@ export default class AuthUsecase implements IAuthUseCase {
   async getUSerdetails(id: string): Promise<IUser | never | null> {
     const userData = await this.authRepository.getUserDetails(id);
     // console.log(userData.status);
-    
+
 
     return userData;
   }
