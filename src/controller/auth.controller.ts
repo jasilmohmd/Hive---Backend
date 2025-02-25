@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import IAuthController from "../interfaces/controllers/IAuthController.interface";
+import IAuthController from "../interfaces/controllers/IAuth.controller.interface";
 import StatusCodes from "../constants/auth/statusCodes";
-import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/IUser.entity";
+import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/User.entity";
 import IAuthUseCase from "../interfaces/usecase/IAuth.usecase.interface";
 import SuccessMessage from "../constants/auth/successMessage";
 import IAuthRequest from "../interfaces/common/IAuthRequest.interface";

@@ -1,4 +1,4 @@
-import IUser, { ILoginCredentials, IRegisterationCredentials } from "../../entity/IUser.entity";
+import IUser, { ILoginCredentials, IRegisterationCredentials } from "../../entity/User.entity";
 
 export default interface IAuthUseCase {
   handleUserRegister(data:IRegisterationCredentials):Promise<string|never>;

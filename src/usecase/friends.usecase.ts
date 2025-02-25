@@ -6,7 +6,7 @@ import ValidationError from "../errors/validationError.error";
 import IFriendRepository from "../interfaces/repository/IFriends.repository.interface";
 import ErrorMessage from "../constants/auth/errorMessage";
 import IFriendUsecase from "../interfaces/usecase/IFriends.usecase.interface";
-import IUser from "../entity/IUser.entity";
+import IUser from "../entity/User.entity";
 
 export default class FriendUseCase implements IFriendUsecase {
   private friendRepository: IFriendRepository;
