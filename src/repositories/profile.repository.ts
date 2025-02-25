@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { ErrorCode } from "../constants/auth/errorCode";
 import { ErrorField } from "../constants/auth/errorField";
 import StatusCodes from "../constants/auth/statusCodes";
-import IUser from "../entity/IUser.entity";
+import IUser from "../entity/User.entity";
 import ValidationError from "../errors/validationError.error";
 import Users from "../framework/models/user.model";
 import IProfileRepository from "../interfaces/repository/IProfile.repository.interface";

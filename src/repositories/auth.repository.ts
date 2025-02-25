@@ -1,4 +1,4 @@
-import IUser from "../entity/IUser.entity";
+import IUser from "../entity/User.entity";
 import OTPModel from "../framework/models/otp.model";
 import Users from "../framework/models/user.model";
 import IAuthRepository from "../interfaces/repository/IAuth.repository.interface";

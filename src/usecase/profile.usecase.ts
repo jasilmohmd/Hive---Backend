@@ -5,7 +5,7 @@ import StatusCodes from "../constants/auth/statusCodes";
 import { ErrorField } from "../constants/auth/errorField";
 import { ErrorCode } from "../constants/auth/errorCode";
 import IProfileRepository from "../interfaces/repository/IProfile.repository.interface";
-import IUser from "../entity/IUser.entity";
+import IUser from "../entity/User.entity";
 
 export default class ProfileUSecase implements IProfileUsecase {
 

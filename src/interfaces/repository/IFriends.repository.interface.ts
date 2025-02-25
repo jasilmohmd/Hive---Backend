@@ -1,4 +1,4 @@
-import IUser from "../../entity/IUser.entity";
+import IUser from "../../entity/User.entity";
 
 export default interface IFriendRepository {
   searchUserByUsername(username: string): Promise<IUser[]>;

@@ -1,4 +1,4 @@
-import IUser from "../../entity/IUser.entity";
+import IUser from "../../entity/User.entity";
 
 export default interface IAuthRepository{
   isUserExist(email: string, userName: string): Promise<IUser | null | never>

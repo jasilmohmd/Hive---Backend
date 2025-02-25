@@ -3,7 +3,7 @@ import { ErrorCode } from "../constants/auth/errorCode";
 import { ErrorField } from "../constants/auth/errorField";
 import ErrorMessage from "../constants/auth/errorMessage";
 import StatusCodes from "../constants/auth/statusCodes";
-import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/IUser.entity";
+import IUser, { ILoginCredentials, IRegisterationCredentials } from "../entity/User.entity";
 import JWTTokenError from "../errors/jwtTokenError.error";
 import RequiredCredentialsNotGiven from "../errors/requiredCredentialsNotGiven.error";
 import ValidationError from "../errors/validationError.error";
