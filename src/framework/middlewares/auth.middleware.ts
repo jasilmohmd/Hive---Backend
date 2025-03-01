@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
-import IAuthMiddleware from "../../interfaces/middleware/IAuthMiddleware.interface";
+import IAuthMiddleware from "../../interfaces/middleware/IAuth.middleware.interface";
 import JWTService from "../utils/jwt.service";
 import IAuthRequest from "../../interfaces/common/IAuthRequest.interface";
 import StatusCodes from "../../constants/auth/statusCodes";
 import ErrorMessage from "../../constants/auth/errorMessage";
 import { ErrorCode } from "../../constants/auth/errorCode";
 import { IPayload } from "../../interfaces/utils/IJwt.service";
-import { isObjectIdOrHexString } from "mongoose";
+import { isObjectIdOrHexString, Types } from "mongoose";
 
 export default class AuthMiddleware implements IAuthMiddleware {
   private jwtService: JWTService;
@@ -15,7 +15,7 @@ export default class AuthMiddleware implements IAuthMiddleware {
     this.jwtService = jwtService
   }
 
-  isAuthenticated(req: IAuthRequest, res: Response, next: NextFunction): void {
+  isAuthenticated(req: IAuthRequest , res: Response, next: NextFunction): void {
 
     try {
 
@@ -31,13 +31,13 @@ export default class AuthMiddleware implements IAuthMiddleware {
 
         const decoded: IPayload = this.jwtService.verifyToken(token);
 
-        if (!isObjectIdOrHexString(decoded.id)) throw {
+        if (!Types.ObjectId.isValid(decoded.userId)) throw {
           statusCode: StatusCodes.BadRequest,
           message: ErrorMessage.NOT_AUTHENTICATED,
           errorCode: ErrorCode.TOKEN_PAYLOAD_NOT_VALID
         };
 
-        req.id = decoded.id
+        req.userId = new Types.ObjectId(decoded.userId)
 
       } catch (error) {
         throw error

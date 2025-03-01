@@ -1,5 +1,6 @@
 import { Request } from "express";
+import { Types } from "mongoose";
 
 export default interface IAuthRequest extends Request {
-  id?: string;
+  userId?: Types.ObjectId;
 }

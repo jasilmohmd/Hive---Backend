@@ -1,4 +1,4 @@
-import { isObjectIdOrHexString } from "mongoose";
+import { isObjectIdOrHexString, Types } from "mongoose";
 import { ErrorCode } from "../constants/auth/errorCode";
 import { ErrorField } from "../constants/auth/errorField";
 import StatusCodes from "../constants/auth/statusCodes";
@@ -27,7 +27,7 @@ export default class FriendUseCase implements IFriendUsecase {
     return await this.friendRepository.searchUserByUsername(username);
   }
 
-  async sendFriendRequest(senderId: string, receiverId: string): Promise<void> {
+  async sendFriendRequest(senderId: Types.ObjectId, receiverId: Types.ObjectId): Promise<void> {
     if (!isObjectIdOrHexString(senderId) || !isObjectIdOrHexString(receiverId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -75,7 +75,7 @@ export default class FriendUseCase implements IFriendUsecase {
   }
   
 
-  async acceptFriendRequest(userId: string, senderId: string): Promise<void> {
+  async acceptFriendRequest(userId: Types.ObjectId, senderId: Types.ObjectId): Promise<void> {
     if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(senderId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -88,7 +88,7 @@ export default class FriendUseCase implements IFriendUsecase {
     await this.friendRepository.acceptFriendRequest(userId, senderId);
   }
 
-  async rejectFriendRequest(userId: string, senderId: string): Promise<void> {
+  async rejectFriendRequest(userId: Types.ObjectId, senderId: Types.ObjectId): Promise<void> {
     if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(senderId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -101,7 +101,7 @@ export default class FriendUseCase implements IFriendUsecase {
     await this.friendRepository.rejectFriendRequest(userId, senderId);
   }
 
-  async removeFriend(userId: string, friendId: string): Promise<void> {
+  async removeFriend(userId: Types.ObjectId, friendId: Types.ObjectId): Promise<void> {
     if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(friendId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -118,7 +118,7 @@ export default class FriendUseCase implements IFriendUsecase {
    * Retrieves pending friend requests for a given user.
    * The repository is expected to populate sender details if needed.
    */
-  async getPendingFriendRequests(userId: string): Promise<any[]> {
+  async getPendingFriendRequests(userId: Types.ObjectId): Promise<any[]> {
     if (!isObjectIdOrHexString(userId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -131,7 +131,7 @@ export default class FriendUseCase implements IFriendUsecase {
   }
 
 
-  async getOnlineFriends(userId: string): Promise<IUser[]> {
+  async getOnlineFriends(userId: Types.ObjectId): Promise<IUser[]> {
     if (!isObjectIdOrHexString(userId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -147,7 +147,7 @@ export default class FriendUseCase implements IFriendUsecase {
   /**
    * Retrieves all friends for a given user.
    */
-  async getAllFriends(userId: string): Promise<IUser[]> {
+  async getAllFriends(userId: Types.ObjectId): Promise<IUser[]> {
     if (!isObjectIdOrHexString(userId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,
@@ -162,7 +162,7 @@ export default class FriendUseCase implements IFriendUsecase {
   /**
    * Blocks a user by adding the blocked user's ID to the user's blocked array.
    */
-  async blockUser(userId: string, blockedUserId: string): Promise<void> {
+  async blockUser(userId: Types.ObjectId, blockedUserId: Types.ObjectId): Promise<void> {
     // Validate IDs
     if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(blockedUserId)) {
       throw new ValidationError({
@@ -190,7 +190,7 @@ export default class FriendUseCase implements IFriendUsecase {
   /**
    * Unblocks a user by removing the blocked user's ID from the user's blocked array.
    */
-  async unblockUser(userId: string, blockedUserId: string): Promise<void> {
+  async unblockUser(userId: Types.ObjectId, blockedUserId: Types.ObjectId): Promise<void> {
     // Validate IDs
     if (!isObjectIdOrHexString(userId) || !isObjectIdOrHexString(blockedUserId)) {
       throw new ValidationError({
@@ -207,7 +207,7 @@ export default class FriendUseCase implements IFriendUsecase {
   /**
    * Retrieves all blocked users for the given user.
    */
-  async getAllBlockedUsers(userId: string): Promise<any[]> {
+  async getAllBlockedUsers(userId: Types.ObjectId): Promise<any[]> {
     if (!isObjectIdOrHexString(userId)) {
       throw new ValidationError({
         statusCode: StatusCodes.BadRequest,

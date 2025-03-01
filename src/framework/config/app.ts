@@ -13,6 +13,7 @@ import authRouter from "../router/auth.router";
 import errorHandlerMiddleware from "../middlewares/error.middleware";
 import friendRouter from "../router/friends.router";
 import profileRouter from "../router/profile.router";
+import communityRouter from "../router/community.router";
 
 // Middlewares
 app.use(cors({
@@ -27,6 +28,7 @@ app.use(morgan("dev")); // Loging all http requests in detail
 app.use("/auth", authRouter); // auth router
 app.use("/friends", friendRouter); // friend router
 app.use("/profile", profileRouter); // Profile router
+app.use("/community", communityRouter); // community router
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);

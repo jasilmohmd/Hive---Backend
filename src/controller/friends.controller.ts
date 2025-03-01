@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import IFriendUsecase from "../interfaces/usecase/IFriends.usecase.interface";
 import IAuthRequest from "../interfaces/common/IAuthRequest.interface";
+import { Types } from "mongoose";
 
 export default class FriendController {
   private friendUseCase: IFriendUsecase;
@@ -29,7 +30,7 @@ export default class FriendController {
    */
   async sendFriendRequest(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const senderId = req.id!
+      const senderId = req.userId!
       const { receiverId } = req.body;
       await this.friendUseCase.sendFriendRequest(senderId, receiverId);
       res.status(200).json({ message: "Friend request sent" });
@@ -44,7 +45,7 @@ export default class FriendController {
    */
   async acceptFriendRequest(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId= req.id!
+      const userId= req.userId!
       const { senderId } = req.body;
       await this.friendUseCase.acceptFriendRequest(userId, senderId);
       res.status(200).json({ message: "Friend request accepted" });
@@ -59,7 +60,7 @@ export default class FriendController {
    */
   async rejectFriendRequest(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
+      const userId = req.userId!
       const { senderId } = req.body;
       await this.friendUseCase.rejectFriendRequest(userId, senderId);
       res.status(200).json({ message: "Friend request rejected" });
@@ -74,8 +75,8 @@ export default class FriendController {
    */
   async removeFriend(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
-      const friendId = req.params.friendId;  // Get friendId from params instead of body
+      const userId = req.userId!
+      const friendId = new Types.ObjectId(req.params.friendId);  // Get friendId from params instead of body
 
       if (!friendId) {
         throw new Error("Friend ID is required");
@@ -94,7 +95,7 @@ export default class FriendController {
    */
   async getPendingFriendRequests(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
+      const userId = req.userId!
       const pendingRequests = await this.friendUseCase.getPendingFriendRequests(userId);
       console.log(pendingRequests);
       res.status(200).json({ pendingRequests });
@@ -109,7 +110,7 @@ export default class FriendController {
  */
 async getOnlineFriends(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const userId = req.id!;
+    const userId = req.userId!;
     const onlineFriends = await this.friendUseCase.getOnlineFriends(userId);
     res.status(200).json({ onlineFriends });
   } catch (error: any) {
@@ -123,7 +124,7 @@ async getOnlineFriends(req: IAuthRequest, res: Response, next: NextFunction): Pr
    */
   async getAllFriends(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
+      const userId = req.userId!
       const friends = await this.friendUseCase.getAllFriends(userId);
       res.status(200).json({ friends });
     } catch (error: any) {
@@ -139,7 +140,7 @@ async getOnlineFriends(req: IAuthRequest, res: Response, next: NextFunction): Pr
    */
   async blockUser(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id! // Ensure your auth middleware sets req.id
+      const userId = req.userId! // Ensure your auth middleware sets req.id
       const { friendId } = req.body;
       console.log(friendId,userId);
       
@@ -156,7 +157,7 @@ async getOnlineFriends(req: IAuthRequest, res: Response, next: NextFunction): Pr
    */
   async unblockUser(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
+      const userId = req.userId!
       const { friendId } = req.body;
       await this.friendUseCase.unblockUser(userId, friendId);
       res.status(200).json({ message: "User unblocked successfully." });
@@ -171,7 +172,7 @@ async getOnlineFriends(req: IAuthRequest, res: Response, next: NextFunction): Pr
    */
   async getAllBlockedUsers(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
+      const userId = req.userId!
       const blockedUsers = await this.friendUseCase.getAllBlockedUsers(userId);
       res.status(200).json({ blockedUsers });
     } catch (error: any) {

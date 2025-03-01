@@ -1,4 +1,4 @@
-import { isObjectIdOrHexString } from "mongoose";
+import { isObjectIdOrHexString, Types } from "mongoose";
 import { ErrorCode } from "../constants/auth/errorCode";
 import { ErrorField } from "../constants/auth/errorField";
 import ErrorMessage from "../constants/auth/errorMessage";
@@ -88,7 +88,7 @@ export default class AuthUsecase implements IAuthUseCase {
 
       const newUSer: IUser = await this.authRepository.createUser(newUSerData);
 
-      const payload: IPayload = { id: newUSer._id }
+      const payload: IPayload = { userId: newUSer._id }
       const token: string = this.JWTService.sign(payload, "1d");
 
       return token
@@ -137,7 +137,7 @@ export default class AuthUsecase implements IAuthUseCase {
       }
 
       const payload: IPayload = {
-        id: userData._id
+        userId: userData._id
       }
 
       const token: string = this.JWTService.sign(payload, "1d");
@@ -153,10 +153,10 @@ export default class AuthUsecase implements IAuthUseCase {
   }
 
 
-  async handleUserLogout(userId: string): Promise<void> {
+  async handleUserLogout(userId: Types.ObjectId): Promise<void> {
     try {
 
-      if (!isObjectIdOrHexString(userId)) {
+      if (!Types.ObjectId.isValid(userId)) {
         throw new ValidationError({
           statusCode: StatusCodes.BadRequest,
           errorField: ErrorField.USER,
@@ -195,7 +195,7 @@ export default class AuthUsecase implements IAuthUseCase {
       try {
         const decoded: IPayload = this.JWTService.verifyToken(token);
 
-        if (!isObjectIdOrHexString(decoded.id)) throw new JWTTokenError({
+        if (!isObjectIdOrHexString(decoded.userId)) throw new JWTTokenError({
           statusCode: StatusCodes.BadRequest,
           message: ErrorMessage.NOT_AUTHENTICATED,
           errorCode: ErrorCode.TOKEN_PAYLOAD_NOT_VALID
@@ -207,7 +207,7 @@ export default class AuthUsecase implements IAuthUseCase {
           errorCode: ErrorCode.TOKEN_EXPIRED_NEW_TOKEN_NEEDED
         });
       }
-    } catch (err: any) {
+    } catch (err) {
       throw err;
     }
   }
@@ -326,8 +326,8 @@ export default class AuthUsecase implements IAuthUseCase {
 
   }
 
-  async getUSerdetails(id: string): Promise<IUser | never | null> {
-    const userData = await this.authRepository.getUserDetails(id);
+  async getUSerdetails(userId: Types.ObjectId): Promise<IUser | never | null> {
+    const userData = await this.authRepository.getUserDetails(userId);
     // console.log(userData.status);
 
 
