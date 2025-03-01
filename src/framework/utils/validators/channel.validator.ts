@@ -11,7 +11,6 @@ const objectIdSchema = z
 
 // Zod schema for Channel Validation
 export const channelValidator = z.object({
-  communityId: objectIdSchema, // Ensure it's a valid MongoDB ObjectId
   name: z
     .string()
     .min(3, { message: "Channel name must be at least 3 characters long." })
@@ -41,7 +40,4 @@ export const channelValidator = z.object({
     .positive()
     .max(1000, { message: "Max participants cannot exceed 1000." })
     .optional(),
-
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
 });

@@ -14,6 +14,8 @@ import errorHandlerMiddleware from "../middlewares/error.middleware";
 import friendRouter from "../router/friends.router";
 import profileRouter from "../router/profile.router";
 import communityRouter from "../router/community.router";
+import channelRouter from "../router/channel.router";
+import roleRouter from "../router/role.router";
 
 // Middlewares
 app.use(cors({
@@ -29,6 +31,8 @@ app.use("/auth", authRouter); // auth router
 app.use("/friends", friendRouter); // friend router
 app.use("/profile", profileRouter); // Profile router
 app.use("/community", communityRouter); // community router
+app.use("/channel", channelRouter); // channel router
+app.use("/role", roleRouter); // role router
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);

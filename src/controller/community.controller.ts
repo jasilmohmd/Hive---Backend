@@ -19,7 +19,7 @@ class CommunityController {
       const userId = req.userId!;
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
 
@@ -53,7 +53,7 @@ class CommunityController {
     try {
       const { searchTerm } = req.query;
       if (typeof searchTerm !== "string") {
-        res.status(400).json({ error: "Invalid search term" });
+        res.status(StatusCodes.BadRequest).json({ error: "Invalid search term" });
         return;
       }
       const communities = await this.communityUsecase.searchCommunitiesByName(searchTerm);
@@ -72,11 +72,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -100,11 +100,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -132,7 +132,7 @@ class CommunityController {
       const userId = req.userId!;
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
 
@@ -150,11 +150,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -180,20 +180,20 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
       if (!memberId) {
-        res.status(401).json({ error: "Member ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Member ID is required" })
         return;
       }
       if (!roleId) {
-        res.status(400).json({ error: "Role ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Role ID is required" })
         return;
       }
 
@@ -214,11 +214,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -238,11 +238,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -264,11 +264,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -289,11 +289,11 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!userId) {
-        res.status(401).json({ error: "Unauthorized" })
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" })
         return;
       }
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -313,7 +313,7 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 
@@ -338,7 +338,7 @@ class CommunityController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       if (!communityId) {
-        res.status(400).json({ error: "Community ID is required" })
+        res.status(StatusCodes.BadRequest).json({ error: "Community ID is required" })
         return;
       }
 

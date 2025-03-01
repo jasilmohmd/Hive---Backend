@@ -1,17 +1,16 @@
 import { NextFunction, Response } from "express";
 import IAuthMiddleware from "../../interfaces/middleware/IAuth.middleware.interface";
-import JWTService from "../utils/jwt.service";
 import IAuthRequest from "../../interfaces/common/IAuthRequest.interface";
 import StatusCodes from "../../constants/auth/statusCodes";
 import ErrorMessage from "../../constants/auth/errorMessage";
 import { ErrorCode } from "../../constants/auth/errorCode";
-import { IPayload } from "../../interfaces/utils/IJwt.service";
+import IJWTService, { IPayload } from "../../interfaces/utils/IJwt.service";
 import { isObjectIdOrHexString, Types } from "mongoose";
 
 export default class AuthMiddleware implements IAuthMiddleware {
-  private jwtService: JWTService;
+  private jwtService: IJWTService;
 
-  constructor(jwtService: JWTService) {
+  constructor(jwtService: IJWTService) {
     this.jwtService = jwtService
   }
 

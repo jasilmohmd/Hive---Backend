@@ -2,22 +2,23 @@ import { Types } from 'mongoose';
 import { IChannelRepository } from '../interfaces/repository/IChannel.repository.interface';
 import { IChannel } from '../entity/Channel.entity';
 import { UnauthorizedError, NotFoundError, ValidationError, CustomError } from '../errors/customError.error';
-import { RBACService } from '../framework/utils/RBACService';
 import { channelValidator } from '../framework/utils/validators/channel.validator';
 import { IRoleRepository } from '../interfaces/repository/IRole.repository.interface';
+import IRBACService from '../interfaces/utils/IRBAC.service';
+import IChannelUsecase from '../interfaces/usecase/IChannel.usecase.interface';
 
-export class ChannelUseCase {
+export class ChannelUseCase implements IChannelUsecase{
   constructor(
     private channelRepository: IChannelRepository,
     private roleRepository: IRoleRepository,
-    private rbacService: RBACService
+    private rbacService: IRBACService
   ) { }
 
   /**
    * Create a new channel.
    * Optionally, you could require RBAC checks here as well.
    */
-  async createChannel(data: IChannel, userId: Types.ObjectId, communityId: Types.ObjectId): Promise<IChannel> {
+  async createChannel(data: Partial<IChannel>, userId: Types.ObjectId, communityId: Types.ObjectId): Promise<IChannel> {
     try {
 
       if (!Types.ObjectId.isValid(communityId)) {
@@ -35,7 +36,7 @@ export class ChannelUseCase {
       // ✅ Validate input data using Zod
       const validatedData = channelValidator.parse(data);
 
-      const createdChannel = await this.channelRepository.createChannel(validatedData);
+      const createdChannel = await this.channelRepository.createChannel({communityId, ...validatedData});
       if (!createdChannel) {
         throw new CustomError({ statusCode: 500, message: "Failed to create channel", errorField: "channel" });
       }

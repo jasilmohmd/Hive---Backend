@@ -2,14 +2,15 @@ import { Types } from 'mongoose';
 import { IRoleRepository } from '../interfaces/repository/IRole.repository.interface';
 import { IRole } from '../entity/Role.entity';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../errors/customError.error';
-import { RBACService } from '../framework/utils/RBACService';
 import { roleValidator } from '../framework/utils/validators/role.validator';
+import IRoleUsecase from '../interfaces/usecase/IRole.usecase.interface';
+import IRBACService from '../interfaces/utils/IRBAC.service';
 
 
-export class RoleUseCase {
+export class RoleUseCase implements IRoleUsecase {
   constructor(
     private roleRepository: IRoleRepository,
-    private rbacService: RBACService // Injected for possible permission checks
+    private rbacService: IRBACService // Injected for possible permission checks
   ) { }
 
   /**
