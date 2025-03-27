@@ -2,6 +2,8 @@ import { Types } from "mongoose";
 
 export interface ICommunity {
   _id?: Types.ObjectId;  // Mongoose auto-generates this
+  imageUrl: string;
+  coverImageUrl: string;
   name: string;
   description?: string;
   type: 'public' | 'private';

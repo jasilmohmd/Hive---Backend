@@ -69,6 +69,29 @@ export default class RoleController implements IRoleController {
     }
   }
 
+  public async getUserRoles(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.userId!;
+      const communityId = new Types.ObjectId(req.params.communityId);
+
+      if (!userId) {
+        res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" });
+        return;
+      }
+      if (!communityId || !Types.ObjectId.isValid(communityId)) {
+        res.status(StatusCodes.BadRequest).json({ error: "Invalid community ID" });
+        return;
+      }
+      
+
+      const roles = await this.roleUsecase.getUserRoles(userId,communityId);
+
+      res.status(StatusCodes.Success).json({roles});
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
   /**
    * Update an existing role.
    * Expects:

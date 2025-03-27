@@ -1,7 +1,7 @@
 
 import { Types } from 'mongoose';
 import { IRoleRepository } from '../interfaces/repository/IRole.repository.interface';
-import { IRole, IUserRole } from '../entity/Role.entity';
+import { IRole } from '../entity/Role.entity';
 import { RoleModel } from '../framework/models/role.model';
 import { CommunityModel } from '../framework/models/community.model';
 
@@ -82,13 +82,20 @@ export class RoleRepository implements IRoleRepository {
   async getUserRoles(userId: Types.ObjectId, communityId: Types.ObjectId): Promise<IRole[]> {
     // Fetch the community document
     const community = await CommunityModel.findById(communityId);
-    if (!community) return [];
+    if (!community) {
+      console.log("Community not found");
+      return [];
+    }
 
-    // Find the member entry for the user
-    const member = community.members.find(m => m.userId.equals(userId));
+    
+
+    // Find the member entry for the user. Explicitly type the member.
+    const member = community.members.find((m: { userId: Types.ObjectId; roleIds: Types.ObjectId[] }) =>
+      m.userId.equals(userId)
+    );
     if (!member || member.roleIds.length === 0) return [];
-
-    // Fetch full role details for all role IDs in the member entry
+    
+    // Fetch full role details for all role IDs in the member entry.
     return await RoleModel.find({ _id: { $in: member.roleIds } });
   }
 

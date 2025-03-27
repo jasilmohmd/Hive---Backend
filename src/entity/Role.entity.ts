@@ -9,13 +9,3 @@ export interface IRole {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-export interface IUserRole {
-  _id?: Types.ObjectId;
-  userId: Types.ObjectId;
-  communityId: Types.ObjectId;
-  roleIds: Types.ObjectId[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-

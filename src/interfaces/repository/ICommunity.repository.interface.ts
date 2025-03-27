@@ -1,5 +1,7 @@
 import { Types } from "mongoose";
 import { ICommunity } from "../../entity/Community.entity";
+import { ITag } from "../../entity/Tag.entity";
+import { ICategory } from "../../entity/CommunityCategory.entity";
 
 export interface ICommunityRepository {
   createCommunity(data: ICommunity): Promise<ICommunity>;
@@ -21,4 +23,7 @@ export interface ICommunityRepository {
   removeTag(communityId: Types.ObjectId, tagId: Types.ObjectId): Promise<boolean>;
   filterCommunitiesByTag(tagId: Types.ObjectId): Promise<ICommunity[]>;
   filterCommunitiesByCategory(categoryId: Types.ObjectId): Promise<ICommunity[]>;
+  getTags(): Promise< ITag []>;
+  getTagById(id: Types.ObjectId): Promise<ITag | null>;
+  getCategories(): Promise<ICategory[]>;
 }

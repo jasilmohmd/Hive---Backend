@@ -33,8 +33,10 @@ export class ChannelUseCase implements IChannelUsecase{
       const allowed = await this.rbacService.hasPermission(userId, communityId, "MANAGE_CHANNELS");
       if (!allowed) throw new UnauthorizedError("Permission denied", "channel");
 
+      const createdBy = userId.toString()
+
       // ✅ Validate input data using Zod
-      const validatedData = channelValidator.parse(data);
+      const validatedData = channelValidator.parse({ createdBy , ...data });
 
       const createdChannel = await this.channelRepository.createChannel({communityId, ...validatedData});
       if (!createdChannel) {
@@ -67,7 +69,7 @@ export class ChannelUseCase implements IChannelUsecase{
   /**
    * Get accessible channels for a given community based on the user's role IDs.
    */
-  async getAccessibleChannels(communityId: Types.ObjectId, userId: Types.ObjectId): Promise<IChannel[]> {
+  async getAccessibleChannels(communityId: Types.ObjectId, userId: Types.ObjectId): Promise<{ [key in 'info' | 'chatroom' | 'voice']?: IChannel[] }> {
     try {
 
       if (!Types.ObjectId.isValid(communityId)) {
@@ -88,11 +90,11 @@ export class ChannelUseCase implements IChannelUsecase{
         .filter((id): id is Types.ObjectId => Boolean(id));
 
 
-      const channels = await this.channelRepository.getAccessibleChannels(communityId, userRoleIds);
-      if (!channels || channels.length === 0) {
-        throw new NotFoundError("No accessible channels found", "channel");
-      }
-      return channels;
+      const groupedChannels = await this.channelRepository.getAccessibleChannels(communityId, userRoleIds);
+      const { info, chatroom, voice } = groupedChannels;
+
+      
+      return groupedChannels;
     } catch (error: any) {
       throw new Error(`Error fetching accessible channels: ${error.message}`);
     }
@@ -154,8 +156,14 @@ export class ChannelUseCase implements IChannelUsecase{
       const allowed = await this.rbacService.hasPermission(userId, communityId, "MANAGE_CHANNELS");
       if (!allowed) throw new UnauthorizedError("Permission denied", "channel");
 
+      const channel = await this.channelRepository.getChannelById(channelId);
+      if(!channel){
+        throw new NotFoundError("Channel not found", "channel");
+      }
+      const createdBy = channel.createdBy.toString()
+
       // ✅ Validate input data using Zod
-      const validatedData = channelValidator.parse(data);
+      const validatedData = channelValidator.parse({createdBy,...data});
 
       const updatedChannel = await this.channelRepository.updateChannel(channelId, validatedData);
       if (!updatedChannel) {

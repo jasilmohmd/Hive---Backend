@@ -8,8 +8,9 @@ const ChannelSchema = new Schema<IChannel & Document>(
     topic: { type: String },  // Short subject/topic for quick reference.
     description: { type: String },  // Detailed description.
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    type: { type: String, enum: ['info', 'chatroom', 'voice'], required: true },
+    type: { type: String, enum: ['info', 'chatroom', 'voiceroom'], required: true },
     allowedRoles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
+    participants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     maxParticipants: { type: Number },  // Optional limit for voice channels.
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt.

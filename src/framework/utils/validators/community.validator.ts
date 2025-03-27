@@ -10,6 +10,12 @@ const objectIdSchema = z
   .transform((val) => new Types.ObjectId(val)); // Convert to ObjectId
 
 export const communityValidator = z.object({
+  // Validate that image is a valid URL string.
+  imageUrl: z.string().url({ message: "Invalid image URL" }),
+
+  // Validate that coverImage is a valid URL string.
+  coverImageUrl: z.string().url({ message: "Invalid cover image URL" }),
+  
   name: z
     .string()
     .min(3, { message: "Community name must be at least 3 characters long." })

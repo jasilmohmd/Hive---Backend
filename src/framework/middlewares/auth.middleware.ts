@@ -5,7 +5,7 @@ import StatusCodes from "../../constants/auth/statusCodes";
 import ErrorMessage from "../../constants/auth/errorMessage";
 import { ErrorCode } from "../../constants/auth/errorCode";
 import IJWTService, { IPayload } from "../../interfaces/utils/IJwt.service";
-import { isObjectIdOrHexString, Types } from "mongoose";
+import { Types } from "mongoose";
 
 export default class AuthMiddleware implements IAuthMiddleware {
   private jwtService: IJWTService;
@@ -37,6 +37,7 @@ export default class AuthMiddleware implements IAuthMiddleware {
         };
 
         req.userId = new Types.ObjectId(decoded.userId)
+        
 
       } catch (error) {
         throw error

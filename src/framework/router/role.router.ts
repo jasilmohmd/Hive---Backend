@@ -32,6 +32,7 @@ roleRouter.use(authMiddleware.isAuthenticated.bind(authMiddleware));
 
 roleRouter.route("/create/:communityId").post(roleController.createRole.bind(roleController));
 roleRouter.route("/:id").get(roleController.getRoleById.bind(roleController));
+roleRouter.route("/user/:communityId").get(roleController.getUserRoles.bind(roleController));
 roleRouter.route("/update/:communityId/:roleId").put(roleController.updateRole.bind(roleController));
 roleRouter.route("/delete/:communityId/:roleId").delete(roleController.deleteRole.bind(roleController));
 roleRouter.route("/list/:communityId").get(roleController.listRoles.bind(roleController));

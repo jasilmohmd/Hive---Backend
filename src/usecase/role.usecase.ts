@@ -78,6 +78,28 @@ export class RoleUseCase implements IRoleUsecase {
 
   }
 
+  async getUserRoles(userId: Types.ObjectId, communityId: Types.ObjectId): Promise<IRole[]> {
+
+    try {
+
+      if (!Types.ObjectId.isValid(communityId)) {
+        throw new ValidationError("Invalid Community ID", "community");
+      }
+
+      if (!Types.ObjectId.isValid(userId)) {
+        throw new ValidationError("Invalid Admin ID", "admin");
+      }
+
+      const roles = await this.roleRepository.getUserRoles(userId, communityId);
+      
+      return roles
+
+    } catch (error:any) {
+      throw new Error(`Error geting roles: ${error.message}`);
+    }
+
+  }
+
   /**
    * Update an existing role.
    * For security, default roles (Owner, Admin, etc.) might be non-editable.

@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import ICommunityUsecase from "../interfaces/usecase/ICommunity.usecase.interface";
 import StatusCodes from "../constants/auth/statusCodes";
 import IAuthRequest from "../interfaces/common/IAuthRequest.interface";
+import { log } from "console";
 
 
 class CommunityController {
@@ -23,15 +24,19 @@ class CommunityController {
         return;
       }
 
-      const { name, description, type, tags } = req.body;
+      const { name, description, type, tags, imageUrl, coverImageUrl } = req.body.data;
+      console.log(req.body.data);
+      
       const community = await this.communityUsecase.createCommunity({
         name,
         description,
         type,
-        ownerId: userId,
+        imageUrl, 
+        coverImageUrl,
+        ownerId: userId.toString(),
         tags,
       });
-      res.status(StatusCodes.Created).json(community);
+      res.status(StatusCodes.Created).json({community});
     } catch (error) {
       next(error);
     }
@@ -40,9 +45,18 @@ class CommunityController {
   // GET /communities/:id
   public async getCommunityById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const id = new Types.ObjectId(req.params.id);
-      const community = await this.communityUsecase.getCommunityById(new Types.ObjectId(id));
-      res.status(StatusCodes.Success).json(community);
+      const { id } = req.params;
+
+      // Validate that id is a valid 24-character hex string
+      if (!id || typeof id !== 'string' || id.length !== 24 || !/^[0-9A-Fa-f]+$/.test(id)) {
+        res.status(StatusCodes.BadRequest).json({ error: "Invalid Community ID" });
+        return;
+      }
+
+      const communityId = new Types.ObjectId(id);
+
+      const community = await this.communityUsecase.getCommunityById(communityId);
+      res.status(StatusCodes.Success).json({community});
     } catch (error) {
       next(error);
     }
@@ -57,7 +71,7 @@ class CommunityController {
         return;
       }
       const communities = await this.communityUsecase.searchCommunitiesByName(searchTerm);
-      res.status(StatusCodes.Success).json(communities);
+      res.status(StatusCodes.Success).json({communities});
     } catch (error) {
       next(error);
     }
@@ -86,7 +100,7 @@ class CommunityController {
         data
       );
 
-      res.status(StatusCodes.Success).json(updatedCommunity);
+      res.status(StatusCodes.Success).json({updatedCommunity});
 
     } catch (error) {
       next(error);
@@ -119,7 +133,7 @@ class CommunityController {
   public async listCommunities(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const communities = await this.communityUsecase.listCommunities();
-      res.status(StatusCodes.Success).json(communities);
+      res.status(StatusCodes.Success).json({communities});
     } catch (error) {
       next(error);
     }
@@ -137,7 +151,7 @@ class CommunityController {
       }
 
       const communities = await this.communityUsecase.getCommunitiesByUser(userId);
-      res.status(StatusCodes.Success).json(communities);
+      res.status(StatusCodes.Success).json({communities});
     } catch (error) {
       next(error);
     }
@@ -273,7 +287,7 @@ class CommunityController {
       }
 
       const result = await this.communityUsecase.addMember(
-        communityId, userId, memberId, roleId
+        userId, communityId, memberId, roleId
       );
       res.status(StatusCodes.Success).json({ success: result });
     } catch (error) {
@@ -360,7 +374,7 @@ class CommunityController {
     try {
       const tagId = new Types.ObjectId(req.params.tagId);
       const communities = await this.communityUsecase.filterCommunitiesByTag(tagId);
-      res.status(StatusCodes.Success).json(communities);
+      res.status(StatusCodes.Success).json({communities});
     } catch (error) {
       next(error);
     }
@@ -371,11 +385,60 @@ class CommunityController {
     try {
       const categoryId = new Types.ObjectId(req.params.categoryId);
       const communities = await this.communityUsecase.filterCommunitiesByCategory(categoryId);
-      res.status(StatusCodes.Success).json(communities);
+      res.status(StatusCodes.Success).json({communities});
     } catch (error) {
       next(error);
     }
   }
+
+  // GET /all categories
+  public async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const categories = await this.communityUsecase.getCategories();
+      res.status(StatusCodes.Success).json({categories});
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /All Tags
+  public async getAllTags(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      const tags = await this.communityUsecase.getAllTags();
+
+      if (!tags || tags.length === 0) {
+        res.status(StatusCodes.NotFound).json({ message: "No tags found" });
+        return;
+      }
+
+      res.status(StatusCodes.Success).json({tags});
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /tag by Id
+  public async getTagById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      const {id} = req.params
+
+      const tag = await this.communityUsecase.getTagById(new Types.ObjectId(id));
+
+      if (!tag) {
+        res.status(StatusCodes.NotFound).json({ message: "No tag found" });
+        return;
+      }
+
+      res.status(StatusCodes.Success).json({tag});
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
+
+
 
 export default CommunityController;

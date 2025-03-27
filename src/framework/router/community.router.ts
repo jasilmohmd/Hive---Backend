@@ -36,12 +36,20 @@ communityRouter.use(authMiddleware.isAuthenticated.bind(authMiddleware));
 
 // Define routes in a specific order to avoid conflicts with parameterized routes
 communityRouter.route("/create").post(communityController.createCommunity.bind(communityController));
-communityRouter.route("/:id").get(communityController.getCommunityById.bind(communityController));
 communityRouter.route("/search").get( communityController.searchCommunities.bind(communityController));
-communityRouter.route("/:communityId").put(communityController.updateCommunity.bind(communityController));
-communityRouter.route("/:communityId").delete(communityController.deleteCommunity.bind(communityController));
 communityRouter.route("/").get(communityController.listCommunities.bind(communityController));
 communityRouter.route("/user").get(communityController.getCommunitiesByUser.bind(communityController));
+
+// Tags and Categories
+communityRouter.route("/tags").get(communityController.getAllTags.bind(communityController));
+communityRouter.route("/categories").get(communityController.getCategories.bind(communityController));
+
+// parameterized routes
+communityRouter.route("/:id").get(communityController.getCommunityById.bind(communityController));
+communityRouter.route("/update/:communityId").put(communityController.updateCommunity.bind(communityController));
+communityRouter.route("/delete/:communityId").delete(communityController.deleteCommunity.bind(communityController));
+communityRouter.route("/tag/:id").get(communityController.getTagById.bind(communityController));
+
 
 // Community join and membership routes
 communityRouter.route("/request/:communityId").post(communityController.requestToJoinCommunity.bind(communityController));

@@ -18,12 +18,15 @@ export default class ChannelController implements IChannelController {
   public async createChannel(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
 
-      const { ...channelData } = req.body as Partial<IChannel>;
+      const { ...channelData } = req.body.data as Partial<IChannel>;
+
+      console.log(channelData);
+      
 
       const userId = req.userId!;
       const communityId = new Types.ObjectId(req.params.communityId)
 
-      if (userId) {
+      if (!userId) {
         res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" });
         return;
       }
@@ -68,7 +71,7 @@ export default class ChannelController implements IChannelController {
       const userId = req.userId!;
       const communityId = new Types.ObjectId(req.params.communityId)
 
-      if (userId) {
+      if (!userId) {
         res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" });
         return;
       }
@@ -76,11 +79,11 @@ export default class ChannelController implements IChannelController {
         res.status(StatusCodes.BadRequest).json({ error: "Invalid community ID" });
         return;
       }
-      const channels = await this.channelUseCase.getAccessibleChannels(
+      const groupedChannels = await this.channelUseCase.getAccessibleChannels(
         communityId,
         userId
       );
-      res.status(StatusCodes.Success).json(channels);
+      res.status(StatusCodes.Success).json({groupedChannels});
     } catch (error: any) {
       next(error);
     }
@@ -97,7 +100,7 @@ export default class ChannelController implements IChannelController {
       const communityId = new Types.ObjectId(req.params.communityId)
 
       const { searchTerm } = req.query;
-      if (userId) {
+      if (!userId) {
         res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" });
         return;
       }
@@ -130,8 +133,8 @@ export default class ChannelController implements IChannelController {
       const userId = req.userId!;
       const communityId = new Types.ObjectId(req.params.communityId)
 
-      const { ...data } = req.body;
-      if (userId) {
+      const { ...data } = req.body.data;
+      if (!userId) {
         res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" });
         return;
       }
@@ -165,7 +168,7 @@ export default class ChannelController implements IChannelController {
       const userId = req.userId!;
       const communityId = new Types.ObjectId(req.params.communityId)
 
-      if (userId) {
+      if (!userId) {
         res.status(StatusCodes.Unauthorized).json({ error: "Unauthorized" });
         return;
       }

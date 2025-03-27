@@ -30,7 +30,7 @@ export default function errorHandlerMiddleware(err: any, req: Request, res: Resp
         } else if (err instanceof JWTTokenError) {
                 res.clearCookie("token", {
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production'
+                        secure: process.env.NODE_ENV === 'development'
                 });
 
                 res.status(err.details.statusCode).json({

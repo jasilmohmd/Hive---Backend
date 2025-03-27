@@ -34,11 +34,11 @@ channelRouter.use(authMiddleware.isAuthenticated.bind(authMiddleware));
 
 
 
-channelRouter.route("/create").post(channelController.createChannel.bind(channelController));
+channelRouter.route("/create/:communityId").post(channelController.createChannel.bind(channelController));
 channelRouter.route("/:id").get(channelController.getChannelById.bind(channelController));
 channelRouter.route("/list/:communityId").get(channelController.getAccessibleChannels.bind(channelController));
 channelRouter.route("/search/:communityId").get(channelController.searchAccessibleChannels.bind(channelController));
-channelRouter.route("update/:communityId/:channelId").put(channelController.updateChannel.bind(channelController));
-channelRouter.route("delete/:communityId/:channelId").delete(channelController.deleteChannel.bind(channelController));
+channelRouter.route("/update/:communityId/:channelId").put(channelController.updateChannel.bind(channelController));
+channelRouter.route("/delete/:communityId/:channelId").delete(channelController.deleteChannel.bind(channelController));
 
 export default channelRouter;

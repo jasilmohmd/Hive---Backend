@@ -3,6 +3,9 @@ import { ICommunity } from '../entity/Community.entity';
 import { ICommunityRepository } from '../interfaces/repository/ICommunity.repository.interface';
 import { CommunityModel, ICommunityDocument } from '../framework/models/community.model';
 import { TagModel } from '../framework/models/tag.model';
+import { CategoryModel } from '../framework/models/communityCategory.model';
+import { ICategory } from '../entity/CommunityCategory.entity';
+import { ITag } from '../entity/Tag.entity';
 
 export class CommunityRepository implements ICommunityRepository {
   async createCommunity(data: ICommunity): Promise<ICommunityDocument> {
@@ -12,7 +15,7 @@ export class CommunityRepository implements ICommunityRepository {
 
   async getCommunityById(id: Types.ObjectId): Promise<ICommunityDocument | null> {
     return (await CommunityModel.findById(id)
-      .populate('roles channels members.userId members.roleIds tags')) as ICommunityDocument | null;
+      .populate('ownerId roles channels members.userId members.roleIds tags')) as ICommunityDocument | null;
   }
 
   async getCommunityByName(name: string): Promise<ICommunityDocument | null> {
@@ -29,7 +32,7 @@ export class CommunityRepository implements ICommunityRepository {
    * Get all communities a user is a member of.
    */
   async getCommunitiesByUser(userId: Types.ObjectId): Promise<ICommunityDocument[]> {
-    return (await CommunityModel.find({ 
+    return (await CommunityModel.find({
       "members.userId": userId
     }).populate('roles channels members.userId members.roleIds tags')) as ICommunityDocument[];
   }
@@ -98,13 +101,13 @@ export class CommunityRepository implements ICommunityRepository {
   }
 
 
-  
+
   async getUserRoles(communityId: Types.ObjectId, userId: Types.ObjectId): Promise<Types.ObjectId[]> {
     const community = await this.getCommunityById(communityId);
     if (!community) return [];
     return community.members
-    .filter(member => member.userId.equals(userId))
-    .flatMap(member => member.roleIds);
+      .filter(member => member.userId.equals(userId))
+      .flatMap(member => member.roleIds);
   }
 
   async addMember(communityId: Types.ObjectId, userId: Types.ObjectId, roleId: Types.ObjectId): Promise<boolean> {
@@ -112,7 +115,7 @@ export class CommunityRepository implements ICommunityRepository {
     if (!community) return false;
     // Prevent adding the same member twice.
     if (community.members.some(member => member.userId === userId)) return false;
-    community.members.push({ 
+    community.members.push({
       userId: userId,
       roleIds: [roleId],
     });
@@ -155,13 +158,14 @@ export class CommunityRepository implements ICommunityRepository {
   }
 
   /**
-   * Filter communities by a specific tag.
-   */
+  * Filter communities by a specific tag.
+  */
   async filterCommunitiesByTag(tagId: Types.ObjectId): Promise<ICommunityDocument[]> {
     return (await CommunityModel.find({
-      tags: new Types.ObjectId(tagId)
-    }).populate('roles channels members.userId members.roleId tags')) as ICommunityDocument[];
+      tags: { $in: [tagId] }
+    }).populate('roles channels members.userId members.roleIds tags')) as ICommunityDocument[];
   }
+
 
   /**
    * Filter communities by category.
@@ -174,6 +178,24 @@ export class CommunityRepository implements ICommunityRepository {
     const tagIds = tags.map(tag => tag._id);
     return (await CommunityModel.find({ tags: { $in: tagIds } })
       .populate('roles channels members.userId members.roleId tags')) as ICommunityDocument[];
+  }
+
+  /**
+  * Retrieve all tags.
+  */
+  async getTags(): Promise<(ITag & Document)[]> {
+    return await TagModel.find({});
+  }
+
+  async getTagById(id: Types.ObjectId): Promise<ITag | null> {
+    return await TagModel.findOne({_id: id});
+  }
+
+  /**
+   * Retrieve all categories.
+   */
+  async getCategories(): Promise<(ICategory & Document)[]> {
+    return await CategoryModel.find({});
   }
 
 }

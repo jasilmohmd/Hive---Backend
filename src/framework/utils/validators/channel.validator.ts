@@ -26,10 +26,15 @@ export const channelValidator = z.object({
     .max(500, { message: "Description cannot exceed 500 characters." })
     .optional(),
 
-  createdBy: objectIdSchema, // Ensure the creator ID is a valid ObjectId
+  createdBy: z
+    .string()
+    .refine((val) => Types.ObjectId.isValid(val), {
+      message: "Invalid ObjectId format",
+    })
+    .transform((val) => new Types.ObjectId(val)), // Ensure the creator ID is a valid ObjectId
 
-  type: z.enum(["info", "chatroom", "voice"], {
-    errorMap: () => ({ message: "Type must be either 'info', 'chatroom', or 'voice'." }),
+  type: z.enum(["info", "chatroom", "voiceroom"], {
+    errorMap: () => ({ message: "Type must be either 'info', 'chatroom', or 'voiceroom'." }),
   }),
 
   allowedRoles: z.array(objectIdSchema).min(1, { message: "At least one role must be allowed." }),
@@ -38,6 +43,6 @@ export const channelValidator = z.object({
     .number()
     .int()
     .positive()
-    .max(1000, { message: "Max participants cannot exceed 1000." })
+    .max(20, { message: "Max participants cannot exceed 20." })
     .optional(),
 });

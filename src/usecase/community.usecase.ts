@@ -8,6 +8,8 @@ import { ICommunityDocument } from '../framework/models/community.model';
 import { communityValidator } from '../framework/utils/validators/community.validator';
 import { defaultRolesData } from '../constants/predifinedRoles';
 import IRBACService from '../interfaces/utils/IRBAC.service';
+import { ITag } from '../entity/Tag.entity';
+import { ICategory } from '../entity/CommunityCategory.entity';
 
 
 
@@ -21,7 +23,7 @@ export class CommunityUseCase {
   /**
    * Create a new community and automatically generate default roles.
    */
-  async createCommunity(data: { name: string; description?: string; type: 'public' | 'private'; ownerId: Types.ObjectId; tags?: string[] }): Promise<ICommunity> {
+  async createCommunity(data: { imageUrl: string, coverImageUrl: string, name: string; description?: string; type: 'public' | 'private'; ownerId: string; tags?: string[] }): Promise<ICommunity> {
     try {
 
 
@@ -348,8 +350,8 @@ export class CommunityUseCase {
         throw new ValidationError("Invalid Role ID", "role");
       }
 
-      const community = await this.communityRepository.getCommunityById(communityId);
-      if (!community) throw new NotFoundError("Community not found", "community");
+      // const community = await this.communityRepository.getCommunityById(communityId);
+      // if (!community) throw new NotFoundError("Community not found", "community");
 
       const allowed = await this.rbacService.hasPermission(userId, communityId, "MANAGE_MEMBERS");
       if (!allowed) throw new UnauthorizedError("Permission denied", "community");
@@ -488,6 +490,36 @@ export class CommunityUseCase {
       return communities;
     } catch (error: any) {
       throw new Error(`Error filtering communities by category: ${error.message}`);
+    }
+  }
+
+  /**
+   * List all Tags.
+   */
+  async getAllTags(): Promise<ITag[]> {
+    try {
+      return await this.communityRepository.getTags();
+    } catch (error: any) {
+      throw new Error(`Error listing tags: ${error.message}`);
+    }
+  }
+
+  async getTagById(id: Types.ObjectId): Promise<ITag | null> {
+    try {
+      return await this.communityRepository.getTagById(id);
+    } catch (error: any) {
+      throw new Error(`Error finding tag: ${error.message}`);
+    }
+  }
+
+  /**
+   * List all Categories.
+   */
+  async getCategories(): Promise<ICategory[]> {
+    try {
+      return await this.communityRepository.getCategories();
+    } catch (error: any) {
+      throw new Error(`Error listing categories: ${error.message}`);
     }
   }
 

@@ -6,6 +6,8 @@ const CommunitySchema = new Schema<ICommunity & Document>(
     name: { type: String, required: true },
     description: { type: String },
     type: { type: String, enum: ['public', 'private'], required: true },
+    imageUrl: { type: String, required: true },
+    coverImageUrl: { type: String, required: true },
     ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }], // Role references
     channels: [{ type: Schema.Types.ObjectId, ref: 'Channel' }], // Channel references
