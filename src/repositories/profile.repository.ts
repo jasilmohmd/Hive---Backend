@@ -7,18 +7,19 @@ import ValidationError from "../errors/validationError.error";
 import Users from "../framework/models/user.model";
 import IProfileRepository from "../interfaces/repository/IProfile.repository.interface";
 import ErrorMessage from "../constants/auth/errorMessage";
+import { Types } from "mongoose";
 
 export default class ProfileRepository implements IProfileRepository {
 
   /**
    * Update the user's username.
    */
-  async editProfile(userId: string, newUserName: string): Promise<IUser> {
+  async editProfile(userId: Types.ObjectId, newUserName: string): Promise<IUser> {
 
     // Check if the new username already exists in the database
     const existingUser = await Users.findOne({ userName: newUserName });
     // If a user is found and it's not the current user, throw an error
-    if (existingUser && existingUser._id.toString() !== userId) {
+    if (existingUser && existingUser._id !== userId) {
       throw new ValidationError({
         statusCode: StatusCodes.Conflict,
         errorField: ErrorField.USER,
@@ -48,7 +49,7 @@ export default class ProfileRepository implements IProfileRepository {
    * Update the user's password.
    * Note: In a real-world application, you should hash the new password before saving.
    */
-  async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<IUser> {
+  async changePassword(userId: Types.ObjectId, oldPassword: string, newPassword: string): Promise<IUser> {
     // Find the user by ID
     const user = await Users.findById(userId);
     if (!user) {

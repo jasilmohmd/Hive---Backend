@@ -3,7 +3,7 @@ import IJWTService, { IPayload } from "../../interfaces/utils/IJwt.service";
 
 
 export default class JWTService implements IJWTService {
-  sign(payload: IPayload, expiresIn: string | number): string | never {
+  sign(payload: IPayload , expiresIn: string | number): string | never {
     try {
 
       // Ensure compatibility with SignOptions
@@ -18,7 +18,7 @@ export default class JWTService implements IJWTService {
     }
   }
 
-  verifyToken(token: string): IPayload | never {
+  verifyToken(token: string): (IPayload  | never) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY!);
       return decoded as IPayload;

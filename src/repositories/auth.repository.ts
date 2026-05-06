@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import IUser from "../entity/User.entity";
 import OTPModel from "../framework/models/otp.model";
 import Users from "../framework/models/user.model";
@@ -78,7 +79,7 @@ export default class AuthRepository implements IAuthRepository {
 
   }
 
-  async updateUserStatus(userId: string, status: "online" | "offline"): Promise<void> {
+  async updateUserStatus(userId: Types.ObjectId, status: "online" | "offline"): Promise<void> {
     try{
 
       await Users.updateOne({ _id: userId }, { $set: { status } });
@@ -97,7 +98,7 @@ export default class AuthRepository implements IAuthRepository {
     }
   }
 
-  async getUserDetails(userId: string): Promise<IUser | never>{
+  async getUserDetails(userId: Types.ObjectId): Promise<IUser | never>{
 
     try{
 
@@ -117,7 +118,7 @@ export default class AuthRepository implements IAuthRepository {
   }
 
 
-  async updatePassword(userId: string, hashedPassword: string): Promise<Document | null> {
+  async updatePassword(userId: Types.ObjectId, hashedPassword: string): Promise<Document | null> {
     try {
       return await Users.findByIdAndUpdate(userId, { password: hashedPassword });
     } catch (error) {

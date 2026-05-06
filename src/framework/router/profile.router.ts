@@ -1,5 +1,5 @@
 import { Router } from "express";
-import IAuthMiddleware from "../../interfaces/middleware/IAuthMiddleware.interface";
+import IAuthMiddleware from "../../interfaces/middleware/IAuth.middleware.interface";
 import IJWTService from "../../interfaces/utils/IJwt.service";
 import IProfileRepository from "../../interfaces/repository/IProfile.repository.interface";
 import IProfileUsecase from "../../interfaces/usecase/IProfile.usecase.interface";

@@ -1,4 +1,5 @@
 // Adjust the path to your Mongoose model
+import { Types } from "mongoose";
 import { ErrorCode } from "../constants/auth/errorCode";
 import { ErrorField } from "../constants/auth/errorField";
 import StatusCodes from "../constants/auth/statusCodes";
@@ -15,7 +16,7 @@ export default class FriendRepository implements IFriendRepository {
     });
   }
 
-  async checkFriendshipStatus(senderId: string, receiverId: string): Promise<string> {
+  async checkFriendshipStatus(senderId: Types.ObjectId, receiverId: Types.ObjectId): Promise<string> {
     const receiver = await Users.findOne(
       { _id: receiverId },
       { friends: 1, friendRequests: 1 }
@@ -30,11 +31,11 @@ export default class FriendRepository implements IFriendRepository {
       });
     }
 
-    if (receiver.friends.includes(senderId)) {
+    if (receiver.friends.includes(senderId.toString())) {
       return "already_friends";
     }
 
-    const requestExists = receiver.friendRequests.some(req => req.sender.toString() === senderId);
+    const requestExists = receiver.friendRequests.some(req => req.sender.toString() === senderId.toString());
 
     if (requestExists) {
       return "request_pending";
@@ -48,7 +49,7 @@ export default class FriendRepository implements IFriendRepository {
   /**
  * Adds a friend request only if the sender is not already a friend or hasn't sent a request.
  */
-  async addFriendRequest(senderId: string, receiverId: string): Promise<string> {
+  async addFriendRequest(senderId: Types.ObjectId, receiverId: Types.ObjectId): Promise<string> {
     // Fetch receiver's document to check existing friends & requests
     const receiver = await Users.findOne(
       { _id: receiverId },
@@ -60,13 +61,13 @@ export default class FriendRepository implements IFriendRepository {
     }
 
     // Check if already friends
-    if (receiver.friends.includes(senderId)) {
+    if (receiver.friends.includes(senderId.toString())) {
       return "You are already friends.";
     }
 
     // Check if a friend request has already been sent
     const requestExists = receiver.friendRequests.some(
-      (req) => req.sender.toString() === senderId
+      (req) => req.sender.toString() === senderId.toString()
     );
 
     if (requestExists) {
@@ -86,7 +87,7 @@ export default class FriendRepository implements IFriendRepository {
  * Accepts a friend request by updating the friendRequests status, 
  * adding each user to the other's friends list, and removing the request.
  */
-  async acceptFriendRequest(userId: string, senderId: string): Promise<void> {
+  async acceptFriendRequest(userId: Types.ObjectId, senderId: Types.ObjectId): Promise<void> {
     // Accept the friend request: update status and add sender to user's friends list
     await Users.updateOne(
       { _id: userId, "friendRequests.sender": senderId },
@@ -107,7 +108,7 @@ export default class FriendRepository implements IFriendRepository {
   /**
    * Rejects a friend request by removing it from the friendRequests array.
    */
-  async rejectFriendRequest(userId: string, senderId: string): Promise<void> {
+  async rejectFriendRequest(userId: Types.ObjectId, senderId: Types.ObjectId): Promise<void> {
     await Users.updateOne(
       { _id: userId },
       { $pull: { friendRequests: { sender: senderId } } }
@@ -117,7 +118,7 @@ export default class FriendRepository implements IFriendRepository {
   /**
    * Removes a friend from both users' friends list.
    */
-  async removeFriend(userId: string, friendId: string): Promise<void> {
+  async removeFriend(userId: Types.ObjectId, friendId: Types.ObjectId): Promise<void> {
     await Users.updateOne(
       { _id: userId },
       { $pull: { friends: friendId } }
@@ -132,7 +133,7 @@ export default class FriendRepository implements IFriendRepository {
   * Retrieves the pending friend requests for the given user.
   * The result includes populated sender details.
   */
-  async getPendingFriendRequests(userId: string): Promise<any[]> {
+  async getPendingFriendRequests(userId: Types.ObjectId): Promise<any[]> {
     // Find the user and populate the sender details from friendRequests.
     const user = await Users.findById(userId)
       .populate('friendRequests.sender', 'userName email status'); // adjust fields as needed
@@ -148,7 +149,7 @@ export default class FriendRepository implements IFriendRepository {
   * Retrieves only online friends of a user.
   * @param userId - The ID of the user whose online friends we want to fetch.
   */
-  async getOnlineFriends(userId: string): Promise<IUser[]> {
+  async getOnlineFriends(userId: Types.ObjectId): Promise<IUser[]> {
     // Find the user's friends (assuming `friends` is an array of user IDs)
     const user = await Users.findById(userId).select("friends");
 
@@ -162,7 +163,7 @@ export default class FriendRepository implements IFriendRepository {
   /**
    * Retrieves all friends for the given user.
    */
-  async getAllFriends(userId: string): Promise<IUser[]> {
+  async getAllFriends(userId: Types.ObjectId): Promise<IUser[]> {
     // Find the user and get the friends array.
     const user = await Users.findById(userId).select('friends');
     if (!user) {
@@ -176,10 +177,10 @@ export default class FriendRepository implements IFriendRepository {
   * Blocks a user by adding the blocked user's ID to the user's blocked array.
   * This method first checks if the user is already blocked.
   */
-  async blockUser(userId: string, blockedUserId: string): Promise<void> {
+  async blockUser(userId: Types.ObjectId, blockedUserId: Types.ObjectId): Promise<void> {
     // Fetch the user document
     const user = await Users.findById(userId).select("blocked");
-    if (user && user.blocked.includes(blockedUserId)) {
+    if (user && user.blocked.includes(blockedUserId.toString())) {
       // Optional: throw an error if already blocked, or simply return
       return;
     }
@@ -192,7 +193,7 @@ export default class FriendRepository implements IFriendRepository {
   /**
    * Unblocks a user by removing the blocked user's ID from the user's blocked array.
    */
-  async unblockUser(userId: string, blockedUserId: string): Promise<void> {
+  async unblockUser(userId: Types.ObjectId, blockedUserId: Types.ObjectId): Promise<void> {
     await Users.updateOne(
       { _id: userId },
       { $pull: { blocked: blockedUserId } }
@@ -203,7 +204,7 @@ export default class FriendRepository implements IFriendRepository {
  * Retrieves all blocked users for the given user.
  * It finds the user by userId, selects the 'blocked' field, and fetches the full user details.
  */
-async getAllBlockedUsers(userId: string): Promise<IUser[]> {
+async getAllBlockedUsers(userId: Types.ObjectId): Promise<IUser[]> {
   // Find the user and retrieve only the blocked user IDs
   const user = await Users.findById(userId).select("blocked");
 

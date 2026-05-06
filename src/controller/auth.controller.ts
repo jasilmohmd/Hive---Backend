@@ -9,6 +9,7 @@ import { ErrorField } from "../constants/auth/errorField";
 import { ErrorCode } from "../constants/auth/errorCode";
 import ValidationError from "../errors/validationError.error";
 import ErrorMessage from "../constants/auth/errorMessage";
+import { Types } from "mongoose";
 
 export default class AuthController implements IAuthController {
 
@@ -108,7 +109,7 @@ export default class AuthController implements IAuthController {
 
   async logoutUser(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id; // Assuming user ID is extracted from the request
+      const userId = req.userId; // Assuming user ID is extracted from the request
   
       
       if (!userId) {
@@ -170,7 +171,7 @@ export default class AuthController implements IAuthController {
 
     try {
     
-      const userData: IUser | null = await this.authUsecase.getUSerdetails(req.id!);
+      const userData: IUser | null = await this.authUsecase.getUSerdetails(req.userId!);
 
       res.status(StatusCodes.Success).json({
         message: SuccessMessage.SUCESSFULL,
@@ -187,7 +188,7 @@ export default class AuthController implements IAuthController {
 
     try {
 
-      const userId = req.params.id
+      const userId = new Types.ObjectId(req.params.id)
     
       const userData: IUser | null = await this.authUsecase.getUSerdetails(userId);
 

@@ -9,7 +9,7 @@ import IHashingService from "../../interfaces/utils/IHashing.service";
 import HashingService from "../utils/hashing.service";
 import IJWTService from "../../interfaces/utils/IJwt.service";
 import JWTService from "../utils/jwt.service";
-import IAuthMiddleware from "../../interfaces/middleware/IAuthMiddleware.interface";
+import IAuthMiddleware from "../../interfaces/middleware/IAuth.middleware.interface";
 import AuthMiddleware from "../middlewares/auth.middleware";
 
 

@@ -18,7 +18,7 @@ export default class ProfileController implements IProfileController {
    */
   async editProfile(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!
+      const userId = req.userId!
       const { newUserName } = req.body;
       const updatedUser = await this.profileUseCase.editProfile(userId, newUserName);
       res.status(StatusCodes.Success).json({
@@ -35,7 +35,7 @@ export default class ProfileController implements IProfileController {
    */
   async changePassword(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.id!; // Assume authentication middleware sets req.id
+      const userId = req.userId!; // Assume authentication middleware sets req.id
       const { oldPassword, newPassword } = req.body;
       const updatedUser = await this.profileUseCase.changePassword(userId, oldPassword, newPassword);
       res.status(StatusCodes.Success).json({

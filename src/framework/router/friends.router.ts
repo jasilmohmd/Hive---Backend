@@ -7,7 +7,7 @@ import FriendRepository from "../../repositories/friends.repository";
 import FriendUseCase from "../../usecase/friends.usecase";
 import IJWTService from "../../interfaces/utils/IJwt.service";
 import JWTService from "../utils/jwt.service";
-import IAuthMiddleware from "../../interfaces/middleware/IAuthMiddleware.interface";
+import IAuthMiddleware from "../../interfaces/middleware/IAuth.middleware.interface";
 import AuthMiddleware from "../middlewares/auth.middleware";
 
 const friendRouter: Router = Router();

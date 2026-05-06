@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export interface IRegisterationCredentials {
   userName: string | undefined;
   email: string | undefined;
@@ -6,7 +8,7 @@ export interface IRegisterationCredentials {
 }
 
 export default interface IUser {
-  _id: string;
+  _id: Types.ObjectId;
   userName: string;
   email: string;
   password: string;
