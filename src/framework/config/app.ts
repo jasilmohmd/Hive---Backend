@@ -1,4 +1,5 @@
 import express, { Express } from "express";
+import { Server } from 'socket.io';
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from 'morgan';
@@ -8,6 +9,14 @@ import { WinstonInstrumentation } from "@opentelemetry/instrumentation-winston";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { Resource } from "@opentelemetry/resources";
 import { context, trace } from '@opentelemetry/api';
+
+
+// Initialize the Express app
+const app: Express = express();
+
+const CORS_ORIGIN: string = process.env.CORS_ORIGIN ?? "http://localhost:4200";
+
+
 
 // Initialize Tracer Provider with service name
 const tracerProvider = new NodeTracerProvider({
@@ -65,7 +74,7 @@ const logger = winston.createLogger({
               `\x1b[90m${duration_ms}ms\x1b[0m` // Grey duration
             ].join(' ');
           }
-          
+
           // Default log format
           const now = new Date();
           const date = now.toISOString().split('T')[0];
@@ -94,12 +103,6 @@ const morganJsonFormat: morgan.FormatFn<express.Request, express.Response> = (
   protocol: `HTTP/${tokens['http-version'](req, res)}`,
   content_length: tokens.res(req, res, 'content-length'),
 });
-
-
-// Initialize the Express app
-const app: Express = express();
-
-const CORS_ORIGIN: string = process.env.CORS_ORIGIN ?? "http://localhost:4200";
 
 
 
@@ -145,6 +148,10 @@ import communityRouter from "../router/community.router";
 import channelRouter from "../router/channel.router";
 import roleRouter from "../router/role.router";
 import imageRouter from "../router/image.router";
+import { createServer } from "http";
+import { ChatUseCase } from "../../usecase/chat.usecase";
+import { ChatRepository } from "../../repositories/chat.repository";
+import { MessageRepository } from "../../repositories/message.repository";
 
 app.use("/auth", authRouter); // auth router
 app.use("/friends", friendRouter); // friend router
@@ -156,5 +163,55 @@ app.use("/image", imageRouter); // image router
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);
+
+const chatUseCase = new ChatUseCase(new MessageRepository(), new ChatRepository());
+
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: CORS_ORIGIN,
+    methods: ["GET", "POST"]
+  }
+});
+
+
+// Add socket.io middleware
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  // Implement your JWT verification here
+  // Set socket.data.userId if authenticated
+  next();
+});
+
+// Socket.io connection handler
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Join chat room
+  socket.on('joinChat', (chatId) => {
+    socket.join(chatId);
+  });
+
+  // Handle messages
+  socket.on('sendMessage', async (messageData) => {
+    try {
+      const savedMessage = await chatUseCase.sendMessage(
+        socket.data.userId,
+        messageData.chatId,
+        messageData.content,
+        messageData.type
+      );
+
+      io.to(messageData.chatId).emit('newMessage', savedMessage);
+    } catch (error) {
+      console.error('Error handling message:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
 
 export default app;

@@ -14,4 +14,8 @@ const MessageSchema = new Schema<IMessage>(
   { timestamps: true }
 );
 
+// Add indexes
+MessageSchema.index({ chatId: 1, timestamp: -1 }); // For message history queries
+MessageSchema.index({ sender: 1 }); // If you need to query by sender
+
 export const MessageModel = mongoose.model<IMessage>('Message', MessageSchema);

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 
-export interface IMessage extends Document {
+export interface IMessage {
   _id?: Types.ObjectId;
   sender: Types.ObjectId;
   chatId: string; // references Chat.chatId
