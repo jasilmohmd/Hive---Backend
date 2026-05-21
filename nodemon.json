@@ -3,5 +3,5 @@
       "src"
   ],
   "ext": ".ts,.js",
-  "exec": "ts-node ./src/server.ts"
+  "exec": "node -r ts-node/register/transpile-only ./src/server.ts"
 }

@@ -249,5 +249,6 @@ exports.ALLOWED_MESSAGE_TYPES = new Set([
     "location",
     "contact",
     "poll",
+    "call",
 ]);
 exports.EDITABLE_MESSAGE_TYPES = new Set(["text", "poll"]);

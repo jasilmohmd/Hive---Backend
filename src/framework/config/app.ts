@@ -13,7 +13,13 @@ import { Resource } from "@opentelemetry/resources";
 // Initialize the Express app
 const app: Express = express();
 
-const CORS_ORIGIN: string = process.env.CORS_ORIGIN ?? "http://localhost:4200";
+/** Strip quotes/spaces from .env values like `"http://localhost:4200"` */
+function readCorsOrigin(): string {
+  const raw = process.env.CORS_ORIGIN ?? "http://localhost:4200";
+  return raw.replace(/^["']|["']$/g, "").trim();
+}
+
+const CORS_ORIGIN: string = readCorsOrigin();
 
 
 
@@ -153,6 +159,11 @@ import { Types } from "mongoose";
 import JWTService from "../utils/jwt.service";
 import { extractSocketToken } from "../utils/socketAuth.util";
 import { createChatUseCase } from "../chatDependencies";
+import { registerCallSignaling } from "../utils/callSignaling";
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({ ok: true });
+});
 
 app.use("/auth", authRouter); // auth router
 app.use("/friends", friendRouter); // friend router
@@ -184,21 +195,46 @@ io.use((socket, next) => {
   try {
     const token = extractSocketToken(socket);
     if (!token) {
+      logger.warn("[socket] auth rejected: missing token");
       return next(new Error("Unauthorized"));
     }
-    const decoded = socketJwtService.verifyToken(token) as unknown as { userId?: string };
-    const uid = String(decoded.userId ?? "");
+    const decoded = socketJwtService.verifyToken(token) as unknown as {
+      userId?: string | { toString(): string };
+    };
+    const raw = decoded.userId;
+    const uid =
+      typeof raw === "string"
+        ? raw
+        : raw != null && typeof raw === "object"
+          ? String(raw)
+          : "";
     if (!Types.ObjectId.isValid(uid)) {
+      logger.warn("[socket] auth rejected: invalid userId in token");
       return next(new Error("Unauthorized"));
     }
     socket.data.userId = uid;
     next();
-  } catch {
+  } catch (err) {
+    logger.warn(
+      `[socket] auth rejected: ${err instanceof Error ? err.message : "verify failed"}`
+    );
     next(new Error("Unauthorized"));
   }
 });
 
+io.engine.on("connection_error", (err: { message?: string; context?: unknown }) => {
+  logger.warn(`[socket] connection_error: ${err.message ?? "unknown"}`);
+});
+
+registerCallSignaling(io, chatUseCase);
+
 io.on("connection", (socket) => {
+  const connectedUserId = socket.data.userId as string | undefined;
+  if (connectedUserId) {
+    socket.join(`user:${connectedUserId}`);
+    logger.info(`Socket connected userId=${connectedUserId}`);
+  }
+
   socket.on("joinChat", (chatId: string) => {
     if (typeof chatId === "string" && chatId) {
       socket.join(chatId);

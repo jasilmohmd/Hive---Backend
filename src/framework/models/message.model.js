@@ -53,6 +53,7 @@ const MessageSchema = new mongoose_1.Schema({
             "location",
             "contact",
             "poll",
+            "call",
         ],
         default: "text",
     },
