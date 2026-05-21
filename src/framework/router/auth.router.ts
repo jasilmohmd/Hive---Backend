@@ -34,6 +34,8 @@ authRouter.route("/logout").post(authMiddleware.isAuthenticated.bind(authMiddlew
 
 authRouter.route("/isUserAuthenticated").post(authController.isUserAuthenticated.bind(authController));
 
+authRouter.route("/realtime-token").get(authController.getRealtimeToken.bind(authController));
+
 authRouter.route("/send-otp").post(authController.sendVerificationOTP.bind(authController));
 
 authRouter.route("/otp_verify").post(authController.verifyOTP.bind(authController));

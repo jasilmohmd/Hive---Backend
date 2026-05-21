@@ -20,6 +20,7 @@ const MessageSchema = new Schema<IMessage>(
         "location",
         "contact",
         "poll",
+        "call",
       ],
       default: "text",
     },

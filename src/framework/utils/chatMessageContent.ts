@@ -291,6 +291,7 @@ export const ALLOWED_MESSAGE_TYPES = new Set([
   "location",
   "contact",
   "poll",
+  "call",
 ]);
 
 export const EDITABLE_MESSAGE_TYPES = new Set(["text", "poll"]);

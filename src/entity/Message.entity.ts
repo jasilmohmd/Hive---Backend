@@ -11,7 +11,8 @@ export type MessageType =
   | "sticker"
   | "location"
   | "contact"
-  | "poll";
+  | "poll"
+  | "call";
 
 export interface IMessageReplyTo {
   _id: Types.ObjectId;

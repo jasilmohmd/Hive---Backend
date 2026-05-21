@@ -144,6 +144,26 @@ class AuthController {
             }
         });
     }
+    getRealtimeToken(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = req.cookies?.token;
+                if (!token) {
+                    throw new validationError_error_1.default({
+                        statusCode: statusCodes_1.default.Unauthorized,
+                        errorField: errorField_1.ErrorField.USER,
+                        message: errorMessage_1.default.NOT_AUTHENTICATED,
+                        errorCode: errorCode_1.ErrorCode.TOKEN_NOT_FOUND,
+                    });
+                }
+                yield this.authUsecase.isUserAuthenticated(token);
+                res.status(statusCodes_1.default.Success).json({ token });
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
     setNewPassword(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

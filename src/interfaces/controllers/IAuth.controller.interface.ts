@@ -6,6 +6,7 @@ export default interface IAuthController {
   login(req: Request, res: Response, next: NextFunction): void;
   logoutUser(req: IAuthRequest, res: Response, next: NextFunction): Promise<void>
   isUserAuthenticated(req: Request, res: Response, next: NextFunction): Promise<void>
+  getRealtimeToken(req: Request, res: Response, next: NextFunction): Promise<void>
   sendVerificationOTP(req: Request, res: Response, next:NextFunction): Promise<void>
   verifyOTP(req: Request, res: Response, next:NextFunction): Promise<void>
   setNewPassword(req: Request, res: Response, next: NextFunction): Promise<void>

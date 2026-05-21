@@ -68,7 +68,8 @@ export default class AuthController implements IAuthController {
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 1 * 24 * 60 * 60 * 1000
+        sameSite: 'lax',
+        maxAge: 1 * 24 * 60 * 60 * 1000,
       });
 
       res.status(StatusCodes.Success).json({
@@ -95,7 +96,8 @@ export default class AuthController implements IAuthController {
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 1 * 24 * 60 * 60 * 1000
+        sameSite: 'lax',
+        maxAge: 1 * 24 * 60 * 60 * 1000,
       });
 
       res.status(StatusCodes.Success).json({
@@ -148,6 +150,25 @@ export default class AuthController implements IAuthController {
         message: SuccessMessage.USER_AUTHENTICATED,
         token,
       });
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
+  /** Returns JWT for Socket.IO (httpOnly cookie → JSON for sessionStorage). */
+  async getRealtimeToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const token = req.cookies?.token as string | undefined;
+      if (!token) {
+        throw new ValidationError({
+          statusCode: StatusCodes.Unauthorized,
+          errorField: ErrorField.USER,
+          message: ErrorMessage.NOT_AUTHENTICATED,
+          errorCode: ErrorCode.TOKEN_NOT_FOUND,
+        });
+      }
+      await this.authUsecase.isUserAuthenticated(token);
+      res.status(StatusCodes.Success).json({ token });
     } catch (error: any) {
       next(error);
     }

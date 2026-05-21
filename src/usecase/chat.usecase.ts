@@ -27,6 +27,7 @@ import {
   stringifyLocationContent,
   stringifyMetadata,
 } from "../framework/utils/chatMessageContent";
+import { parseCallMessageContent } from "../framework/utils/callMessageContent";
 import { extractFirstHttpUrl, fetchLinkPreview } from "../framework/utils/linkPreview";
 import Users from "../framework/models/user.model";
 
@@ -220,6 +221,8 @@ export class ChatUseCase implements IChatUseCase {
     } else if (type === "poll") {
       const poll = parsePollContent(content);
       resolvedContent = buildPollContent(poll);
+    } else if (type === "call") {
+      parseCallMessageContent(content);
     } else if (type === "text") {
       const url = extractFirstHttpUrl(content);
       if (url) {

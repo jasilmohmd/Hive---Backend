@@ -22,6 +22,7 @@ authRouter.route("/register").post(authController.register.bind(authController))
 authRouter.route("/login").post(authController.login.bind(authController));
 authRouter.route("/logout").post(authMiddleware.isAuthenticated.bind(authMiddleware), authController.logoutUser.bind(authController));
 authRouter.route("/isUserAuthenticated").post(authController.isUserAuthenticated.bind(authController));
+authRouter.route("/realtime-token").get(authController.getRealtimeToken.bind(authController));
 authRouter.route("/send-otp").post(authController.sendVerificationOTP.bind(authController));
 authRouter.route("/otp_verify").post(authController.verifyOTP.bind(authController));
 authRouter.route("/set_new_password").post(authController.setNewPassword.bind(authController));
