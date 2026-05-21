@@ -95,8 +95,8 @@ class CommunityController {
       }
 
       const updatedCommunity = await this.communityUsecase.updateCommunity(
-        communityId,
         userId,
+        communityId,
         data
       );
 
@@ -122,7 +122,7 @@ class CommunityController {
         return;
       }
 
-      const result = await this.communityUsecase.deleteCommunity(communityId, userId);
+      const result = await this.communityUsecase.deleteCommunity(userId, communityId);
       res.status(StatusCodes.Success).json({ success: result });
     } catch (error) {
       next(error);

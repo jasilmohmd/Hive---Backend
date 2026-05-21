@@ -94,4 +94,24 @@ export default class ProfileRepository implements IProfileRepository {
     return user;
   }
 
+  async updateAvatar(userId: Types.ObjectId, imageUrl: string | null): Promise<IUser> {
+    const update =
+      imageUrl === null || imageUrl === ""
+        ? { $unset: { imageUrl: 1 } }
+        : { imageUrl };
+
+    const updatedUser = await Users.findByIdAndUpdate(userId, update, {
+      new: true,
+    });
+    if (!updatedUser) {
+      throw new ValidationError({
+        statusCode: StatusCodes.NotFound,
+        errorField: ErrorField.USER,
+        message: ErrorMessage.USER_NOT_FOUND,
+        errorCode: ErrorCode.USER_NOT_FOUND,
+      });
+    }
+    return updatedUser;
+  }
+
 }

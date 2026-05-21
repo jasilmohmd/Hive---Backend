@@ -10,7 +10,6 @@ const ChatSchema = new Schema<IChat>(
 );
 
 // Add indexes
-ChatSchema.index({ chatId: 1 }, { unique: true }); // Unique index for chatId
 ChatSchema.index({ type: 1 }); // If you need to query by chat type
 
 export const ChatModel = mongoose.model<IChat>('Chat', ChatSchema);

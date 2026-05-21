@@ -19,8 +19,10 @@ export default class ImageController {
       const isPublic = req.body.isPublic === 'true';
       const imageUrl = await this.imageUsecase.upload(file.buffer, file.originalname, isPublic);
       res.status(200).json({ imageUrl });
-    } catch (error) {
-      res.status(500).json({ message: 'Image upload failed', error });
+    } catch (error: any) {
+      const message = error?.message || 'Image upload failed';
+      console.error('Image upload error:', message);
+      res.status(500).json({ message });
     }
   }
 }

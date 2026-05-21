@@ -39,7 +39,11 @@ const userSchema: Schema = new Schema<IUser>({
   blocked: [{
     type: Types.ObjectId,
     ref: "Users"
-  }]
+  }],
+  imageUrl: {
+    type: String,
+    required: false,
+  },
 
 });
 

@@ -42,6 +42,6 @@ authRouter.route("/set_new_password").post(authController.setNewPassword.bind(au
 
 authRouter.route("/details").get(authMiddleware.isAuthenticated.bind(authMiddleware), authController.getUserDetails.bind(authController))
 
-authRouter.route("/userDetails/:id").get(authMiddleware.isAuthenticated.bind(authMiddleware), authController.getUserDetails.bind(authController))
+authRouter.route("/userDetails/:id").get(authMiddleware.isAuthenticated.bind(authMiddleware), authController.getUserDetailsById.bind(authController))
  
 export default authRouter;

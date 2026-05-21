@@ -8,7 +8,6 @@ import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { WinstonInstrumentation } from "@opentelemetry/instrumentation-winston";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { Resource } from "@opentelemetry/resources";
-import { context, trace } from '@opentelemetry/api';
 
 
 // Initialize the Express app
@@ -148,10 +147,12 @@ import communityRouter from "../router/community.router";
 import channelRouter from "../router/channel.router";
 import roleRouter from "../router/role.router";
 import imageRouter from "../router/image.router";
+import chatRouter from "../router/chat.router";
 import { createServer } from "http";
-import { ChatUseCase } from "../../usecase/chat.usecase";
-import { ChatRepository } from "../../repositories/chat.repository";
-import { MessageRepository } from "../../repositories/message.repository";
+import { Types } from "mongoose";
+import JWTService from "../utils/jwt.service";
+import { extractSocketToken } from "../utils/socketAuth.util";
+import { createChatUseCase } from "../chatDependencies";
 
 app.use("/auth", authRouter); // auth router
 app.use("/friends", friendRouter); // friend router
@@ -160,58 +161,84 @@ app.use("/community", communityRouter); // community router
 app.use("/channel", channelRouter); // channel router
 app.use("/role", roleRouter); // role router
 app.use("/image", imageRouter); // image router
+app.use("/chat", chatRouter);
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);
 
-const chatUseCase = new ChatUseCase(new MessageRepository(), new ChatRepository());
+const chatUseCase = createChatUseCase();
 
-const server = createServer(app);
-const io = new Server(server, {
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
   cors: {
     origin: CORS_ORIGIN,
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+app.set("io", io);
+
+const socketJwtService = new JWTService();
+
+io.use((socket, next) => {
+  try {
+    const token = extractSocketToken(socket);
+    if (!token) {
+      return next(new Error("Unauthorized"));
+    }
+    const decoded = socketJwtService.verifyToken(token) as unknown as { userId?: string };
+    const uid = String(decoded.userId ?? "");
+    if (!Types.ObjectId.isValid(uid)) {
+      return next(new Error("Unauthorized"));
+    }
+    socket.data.userId = uid;
+    next();
+  } catch {
+    next(new Error("Unauthorized"));
   }
 });
 
-
-// Add socket.io middleware
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
-  // Implement your JWT verification here
-  // Set socket.data.userId if authenticated
-  next();
-});
-
-// Socket.io connection handler
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-
-  // Join chat room
-  socket.on('joinChat', (chatId) => {
-    socket.join(chatId);
-  });
-
-  // Handle messages
-  socket.on('sendMessage', async (messageData) => {
-    try {
-      const savedMessage = await chatUseCase.sendMessage(
-        socket.data.userId,
-        messageData.chatId,
-        messageData.content,
-        messageData.type
-      );
-
-      io.to(messageData.chatId).emit('newMessage', savedMessage);
-    } catch (error) {
-      console.error('Error handling message:', error);
+io.on("connection", (socket) => {
+  socket.on("joinChat", (chatId: string) => {
+    if (typeof chatId === "string" && chatId) {
+      socket.join(chatId);
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
+  socket.on(
+    "sendMessage",
+    async (messageData: {
+      chatId?: string;
+      content?: string;
+      type?: string;
+      replyToMessageId?: string;
+      metadata?: string;
+    }) => {
+      try {
+        const userId = socket.data.userId as string | undefined;
+        if (!userId || !messageData?.chatId || messageData.content === undefined) {
+          socket.emit("chatError", { message: "Invalid message payload" });
+          return;
+        }
+        const savedMessage = await chatUseCase.sendMessage(
+          userId,
+          messageData.chatId,
+          messageData.content,
+          messageData.type ?? "text",
+          {
+            replyToMessageId: messageData.replyToMessageId,
+            metadata: messageData.metadata,
+          }
+        );
+
+        io.to(messageData.chatId).emit("newMessage", savedMessage);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "Failed to send message";
+        socket.emit("chatError", { message: msg });
+      }
+    }
+  );
 });
 
-
+export { app, httpServer, io };
 export default app;

@@ -99,7 +99,8 @@ export default class AuthController implements IAuthController {
       });
 
       res.status(StatusCodes.Success).json({
-        message: SuccessMessage.LOGIN_SUCCESS
+        message: SuccessMessage.LOGIN_SUCCESS,
+        token,
       });
 
     } catch (error) {
@@ -144,7 +145,8 @@ export default class AuthController implements IAuthController {
       await this.authUsecase.isUserAuthenticated(token);
 
       res.status(StatusCodes.Success).json({
-        message: SuccessMessage.USER_AUTHENTICATED
+        message: SuccessMessage.USER_AUTHENTICATED,
+        token,
       });
     } catch (error: any) {
       next(error);

@@ -6,12 +6,14 @@ import { channelValidator } from '../framework/utils/validators/channel.validato
 import { IRoleRepository } from '../interfaces/repository/IRole.repository.interface';
 import IRBACService from '../interfaces/utils/IRBAC.service';
 import IChannelUsecase from '../interfaces/usecase/IChannel.usecase.interface';
+import { IChatRepository } from '../interfaces/repository/IChat.repository.interface';
 
 export class ChannelUseCase implements IChannelUsecase{
   constructor(
     private channelRepository: IChannelRepository,
     private roleRepository: IRoleRepository,
-    private rbacService: IRBACService
+    private rbacService: IRBACService,
+    private chatRepository: IChatRepository
   ) { }
 
   /**
@@ -41,6 +43,13 @@ export class ChannelUseCase implements IChannelUsecase{
       const createdChannel = await this.channelRepository.createChannel({communityId, ...validatedData});
       if (!createdChannel) {
         throw new CustomError({ statusCode: 500, message: "Failed to create channel", errorField: "channel" });
+      }
+      if (createdChannel.type === "chatroom" && createdChannel._id) {
+        const cid = createdChannel._id.toString();
+        const existingChat = await this.chatRepository.findChatById(cid);
+        if (!existingChat) {
+          await this.chatRepository.createChat({ chatId: cid, type: "group" });
+        }
       }
       return createdChannel;
     } catch (error: any) {
@@ -91,9 +100,6 @@ export class ChannelUseCase implements IChannelUsecase{
 
 
       const groupedChannels = await this.channelRepository.getAccessibleChannels(communityId, userRoleIds);
-      const { info, chatroom, voice } = groupedChannels;
-
-      
       return groupedChannels;
     } catch (error: any) {
       throw new Error(`Error fetching accessible channels: ${error.message}`);

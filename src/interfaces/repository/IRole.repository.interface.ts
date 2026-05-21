@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { IRole, IUserRole } from "../../entity/Role.entity";
+import { IRole } from "../../entity/Role.entity";
 
 export interface IRoleRepository {
   createRole(data: IRole): Promise<IRole>;

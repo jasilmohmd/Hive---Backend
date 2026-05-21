@@ -36,3 +36,6 @@ export const communityValidator = z.object({
     .array(objectIdSchema) // ✅ Now each tag is an ObjectId
     .default([]),
 });
+
+/** Partial updates for PUT /community/update/:id */
+export const communityUpdateValidator = communityValidator.partial();

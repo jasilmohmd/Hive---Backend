@@ -46,4 +46,26 @@ export default class ProfileController implements IProfileController {
     }
   }
 
+  /**
+   * PUT /profile/avatar — body: { imageUrl: string | null }
+   * Pass null or empty string to remove the profile photo.
+   */
+  async updateAvatar(req: IAuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.userId!;
+      const raw = req.body?.imageUrl;
+      const imageUrl =
+        raw === undefined || raw === null ? null : String(raw).trim();
+      const normalized =
+        imageUrl === "" || imageUrl === "null" ? null : imageUrl;
+
+      await this.profileUseCase.updateAvatar(userId, normalized);
+      res.status(StatusCodes.Success).json({
+        message: "Profile photo updated successfully",
+      });
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
 }

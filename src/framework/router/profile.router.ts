@@ -26,5 +26,7 @@ profileRouter.put("/edit_profile", profileController.editProfile.bind(profileCon
 
 profileRouter.put("/change_password", profileController.changePassword.bind(profileController));
 
+profileRouter.put("/avatar", profileController.updateAvatar.bind(profileController));
+
 
 export default profileRouter;

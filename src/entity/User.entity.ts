@@ -12,6 +12,7 @@ export default interface IUser {
   userName: string;
   email: string;
   password: string;
+  imageUrl?: string;
   friends: string[]; // Array of user IDs
   friendRequests: {
     sender: string;

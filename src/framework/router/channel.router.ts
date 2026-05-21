@@ -15,18 +15,20 @@ import { RBACService } from "../utils/RBACService";
 import IRBACService from "../../interfaces/utils/IRBAC.service";
 import IChannelController from "../../interfaces/controllers/IChannel.controller.interface";
 import ChannelController from "../../controller/channel.controller";
+import { ChatRepository } from "../../repositories/chat.repository";
 
 const channelRouter: Router = Router();
 
 const channelRepository: IChannelRepository = new ChannelRepository;
 const roleRepository: IRoleRepository = new RoleRepository;
 const communityRepository: ICommunityRepository = new CommunityRepository();
+const chatRepository = new ChatRepository();
 
 const jwtService: IJWTService = new JWTService();
 const authMiddleware: IAuthMiddleware = new AuthMiddleware(jwtService);
 const rbacService: IRBACService = new RBACService(roleRepository,communityRepository);
 
-const channelUsecase: IChannelUsecase = new ChannelUseCase(channelRepository,roleRepository,rbacService);
+const channelUsecase: IChannelUsecase = new ChannelUseCase(channelRepository,roleRepository,rbacService,chatRepository);
 
 const channelController: IChannelController = new ChannelController(channelUsecase);
 

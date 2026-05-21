@@ -5,7 +5,7 @@ import { UnauthorizedError, NotFoundError, ValidationError, CustomError } from '
 import { Types } from 'mongoose';
 import { IRoleRepository } from '../interfaces/repository/IRole.repository.interface';
 import { ICommunityDocument } from '../framework/models/community.model';
-import { communityValidator } from '../framework/utils/validators/community.validator';
+import { communityValidator, communityUpdateValidator } from '../framework/utils/validators/community.validator';
 import { defaultRolesData } from '../constants/predifinedRoles';
 import IRBACService from '../interfaces/utils/IRBAC.service';
 import { ITag } from '../entity/Tag.entity';
@@ -138,11 +138,10 @@ export class CommunityUseCase {
       const community = await this.communityRepository.getCommunityById(communityId);
       if (!community) throw new NotFoundError("Community not found", "community");
 
-      const userRoleIds = await this.communityRepository.getUserRoles(userId, communityId);
       const allowed = await this.rbacService.hasPermission(userId, communityId, "MANAGE_COMMUNITY");
       if (!allowed) throw new UnauthorizedError("Permission denied", "community");
 
-      const validatedData = communityValidator.parse(data);
+      const validatedData = communityUpdateValidator.parse(data);
 
       const updatedCommunity = await this.communityRepository.updateCommunity(communityId, validatedData);
       if (!updatedCommunity) throw new Error("Update failed");

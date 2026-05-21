@@ -10,4 +10,5 @@ export default interface IAuthController {
   verifyOTP(req: Request, res: Response, next:NextFunction): Promise<void>
   setNewPassword(req: Request, res: Response, next: NextFunction): Promise<void>
   getUserDetails(req: IAuthRequest, res: Response, next: NextFunction): Promise<void>
+  getUserDetailsById(req: Request, res: Response, next: NextFunction): Promise<void>
 }

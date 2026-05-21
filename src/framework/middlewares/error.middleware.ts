@@ -38,6 +38,12 @@ export default function errorHandlerMiddleware(err: any, req: Request, res: Resp
                         type: ErrorType.TOKEN,
                         errorCode: err.details.errorCode
                 });
+        } else if (err && typeof err === "object" && "statusCode" in err && "message" in err) {
+                res.status(Number(err.statusCode) || StatusCodes.InternalServer).json({
+                        message: String(err.message),
+                        errorCode: err.errorCode,
+                        type: err.type ?? ErrorType.TOKEN
+                });
         } else {
                 // Log entire error object
                 console.error(err);

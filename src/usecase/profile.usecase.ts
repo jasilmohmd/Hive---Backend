@@ -1,4 +1,5 @@
 import { isObjectIdOrHexString, Types } from "mongoose";
+import { z } from "zod";
 import IProfileUsecase from "../interfaces/usecase/IProfile.usecase.interface";
 import ValidationError from "../errors/validationError.error";
 import StatusCodes from "../constants/auth/statusCodes";
@@ -37,6 +38,26 @@ export default class ProfileUSecase implements IProfileUsecase {
       });
     }
     return await this.profileRepository.changePassword(userId, oldPassword, newPassword);
+  }
+
+  async updateAvatar(userId: Types.ObjectId, imageUrl: string | null): Promise<IUser> {
+    if (!isObjectIdOrHexString(userId)) {
+      throw new ValidationError({
+        statusCode: StatusCodes.BadRequest,
+        errorField: ErrorField.USER,
+        message: "User ID is required.",
+        errorCode: ErrorCode.INVALID_INPUT,
+      });
+    }
+
+    if (imageUrl !== null && imageUrl !== "") {
+      z.string().url({ message: "Invalid image URL" }).parse(imageUrl);
+    }
+
+    return await this.profileRepository.updateAvatar(
+      userId,
+      imageUrl === "" ? null : imageUrl
+    );
   }
 
 }

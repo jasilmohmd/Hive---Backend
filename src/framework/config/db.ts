@@ -10,8 +10,14 @@ if (!dbUrl) {
 
 const connectDB = async () => {
   try {
+    // Fail fast instead of buffering queries when DB is unreachable.
+    mongoose.set("bufferCommands", false);
 
-    const connect = await mongoose.connect(dbUrl, { dbName: "Hive_DB" });
+    const connect = await mongoose.connect(dbUrl, {
+      dbName: "Hive_DB",
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    });
 
     console.log(`Server connected to host ${connect.connection.host}`);
 
