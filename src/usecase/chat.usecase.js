@@ -20,6 +20,9 @@ const callMessageContent_1 = require("../framework/utils/callMessageContent");
 const linkPreview_1 = require("../framework/utils/linkPreview");
 const user_model_1 = __importDefault(require("../framework/models/user.model"));
 const DIRECT_CHAT_REGEX = /^([a-fA-F0-9]{24})_([a-fA-F0-9]{24})$/;
+function channelSupportsTextChat(type) {
+    return type === "chatroom" || type === "voiceroom";
+}
 function communityObjectId(channel) {
     const c = channel.communityId;
     if (c instanceof mongoose_1.Types.ObjectId)
@@ -71,7 +74,7 @@ class ChatUseCase {
             }
             const channelId = new mongoose_1.Types.ObjectId(chat.chatId);
             const channel = yield this.channelRepository.getChannelById(channelId);
-            if (!channel || channel.type !== "chatroom") {
+            if (!channel || !channelSupportsTextChat(channel.type)) {
                 throw new Error("Invalid channel chat");
             }
             if (!(yield this.userHasChannelAccess(userId, channel))) {
@@ -116,7 +119,7 @@ class ChatUseCase {
             if (!channel) {
                 throw new Error("Chat does not exist");
             }
-            if (channel.type !== "chatroom") {
+            if (!channelSupportsTextChat(channel.type)) {
                 throw new Error("This channel does not support text chat");
             }
             if (!(yield this.userHasChannelAccess(senderId, channel))) {
@@ -295,7 +298,7 @@ class ChatUseCase {
                 else if (mongoose_1.Types.ObjectId.isValid(chatId)) {
                     const channelId = new mongoose_1.Types.ObjectId(chatId);
                     const channel = yield this.channelRepository.getChannelById(channelId);
-                    if (!channel || channel.type !== "chatroom") {
+                    if (!channel || !channelSupportsTextChat(channel.type)) {
                         throw new Error("Chat does not exist");
                     }
                     if (!(yield this.userHasChannelAccess(userOid, channel))) {

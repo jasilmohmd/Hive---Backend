@@ -11,6 +11,10 @@ import ValidationError from "../errors/validationError.error";
 import ErrorMessage from "../constants/auth/errorMessage";
 import { Types } from "mongoose";
 
+const isProd = process.env.NODE_ENV === "production";
+const authCookieSameSite = (process.env.COOKIE_SAME_SITE?.trim().toLowerCase() ||
+  (isProd ? "none" : "lax")) as "lax" | "strict" | "none";
+
 export default class AuthController implements IAuthController {
 
   private authUsecase: IAuthUseCase
@@ -67,8 +71,8 @@ export default class AuthController implements IAuthController {
 
       res.cookie('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: isProd,
+        sameSite: authCookieSameSite,
         maxAge: 1 * 24 * 60 * 60 * 1000,
       });
 
@@ -95,8 +99,8 @@ export default class AuthController implements IAuthController {
 
       res.cookie('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: isProd,
+        sameSite: authCookieSameSite,
         maxAge: 1 * 24 * 60 * 60 * 1000,
       });
 
@@ -129,7 +133,8 @@ export default class AuthController implements IAuthController {
       // 🔹 Clear the authentication token
       res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProd,
+        sameSite: authCookieSameSite,
       });
   
       res.status(StatusCodes.Success).json({

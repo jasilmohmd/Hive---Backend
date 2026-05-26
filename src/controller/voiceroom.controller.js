@@ -39,5 +39,21 @@ class VoiceroomController {
             }
         });
     }
+    getPresence(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (!req.userId) {
+                    res.status(statusCodes_1.default.Unauthorized).json({ message: "Not authenticated" });
+                    return;
+                }
+                const channelId = req.params.channelId;
+                const result = yield this.voiceroomUseCase.getPresence(req.userId.toString(), channelId);
+                res.status(statusCodes_1.default.Success).json(result);
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
 }
 exports.VoiceroomController = VoiceroomController;

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getChannelPresenceList = getChannelPresenceList;
 exports.registerVoiceroomPresence = registerVoiceroomPresence;
 const channel_repository_1 = require("../../repositories/channel.repository");
 const community_repository_1 = require("../../repositories/community.repository");
@@ -21,7 +22,7 @@ const channelPresence = new Map();
 function channelRoom(channelId) {
     return `channel:${channelId}`;
 }
-function getPresenceList(channelId) {
+function getChannelPresenceList(channelId) {
     const map = channelPresence.get(channelId);
     if (!map)
         return [];
@@ -30,7 +31,7 @@ function getPresenceList(channelId) {
 function broadcastState(io, channelId) {
     io.to(channelRoom(channelId)).emit("room:state", {
         channelId,
-        participants: getPresenceList(channelId),
+        participants: getChannelPresenceList(channelId),
     });
 }
 const channelRepository = new channel_repository_1.ChannelRepository();
@@ -49,7 +50,29 @@ function registerVoiceroomPresence(io) {
                 }
             }
         });
+        socket.on("room:watch", (data) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (!(data === null || data === void 0 ? void 0 : data.channelId))
+                    return;
+                yield (0, channelAccess_util_1.assertVoiceroomChannelAccess)(userId, data.channelId, channelRepository, communityRepository);
+                socket.join(channelRoom(data.channelId));
+                socket.emit("room:state", {
+                    channelId: data.channelId,
+                    participants: getChannelPresenceList(data.channelId),
+                });
+            }
+            catch (error) {
+                const message = error instanceof Error ? error.message : "Could not watch room";
+                socket.emit("room:error", { message });
+            }
+        }));
+        socket.on("room:unwatch", (data) => {
+            if (!(data === null || data === void 0 ? void 0 : data.channelId))
+                return;
+            socket.leave(channelRoom(data.channelId));
+        });
         socket.on("room:join", (data) => __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             try {
                 if (!(data === null || data === void 0 ? void 0 : data.channelId))
                     return;
@@ -60,14 +83,16 @@ function registerVoiceroomPresence(io) {
                     map = new Map();
                     channelPresence.set(data.channelId, map);
                 }
-                const user = yield user_model_1.default.findById(userId).select("userName").lean();
-                const userName = user && typeof user.userName === "string"
-                    ? user.userName
-                    : "User";
+                const user = yield user_model_1.default.findById(userId).select("userName imageUrl").lean();
+                const row = user;
+                const existing = map.get(userId);
                 map.set(userId, {
                     userId,
-                    userName,
+                    userName: row && typeof row.userName === "string" ? row.userName : "User",
+                    imageUrl: row && typeof row.imageUrl === "string" ? row.imageUrl : undefined,
                     muted: !!data.muted,
+                    cameraOn: (_a = existing === null || existing === void 0 ? void 0 : existing.cameraOn) !== null && _a !== void 0 ? _a : false,
+                    screenOn: (_b = existing === null || existing === void 0 ? void 0 : existing.screenOn) !== null && _b !== void 0 ? _b : false,
                 });
                 broadcastState(io, data.channelId);
             }
@@ -83,9 +108,9 @@ function registerVoiceroomPresence(io) {
             if (map === null || map === void 0 ? void 0 : map.delete(userId)) {
                 if (map.size === 0)
                     channelPresence.delete(data.channelId);
-                socket.leave(channelRoom(data.channelId));
-                broadcastState(io, data.channelId);
             }
+            /* Stay in channel room if still watching lobby — only room:unwatch leaves */
+            broadcastState(io, data.channelId);
         });
         socket.on("room:mute", (data) => {
             if (!(data === null || data === void 0 ? void 0 : data.channelId))
@@ -95,6 +120,19 @@ function registerVoiceroomPresence(io) {
             if (!p)
                 return;
             p.muted = !!data.muted;
+            broadcastState(io, data.channelId);
+        });
+        socket.on("room:media", (data) => {
+            if (!(data === null || data === void 0 ? void 0 : data.channelId))
+                return;
+            const map = channelPresence.get(data.channelId);
+            const p = map === null || map === void 0 ? void 0 : map.get(userId);
+            if (!p)
+                return;
+            if (data.cameraOn !== undefined)
+                p.cameraOn = !!data.cameraOn;
+            if (data.screenOn !== undefined)
+                p.screenOn = !!data.screenOn;
             broadcastState(io, data.channelId);
         });
     });
