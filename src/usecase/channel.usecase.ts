@@ -44,7 +44,10 @@ export class ChannelUseCase implements IChannelUsecase{
       if (!createdChannel) {
         throw new CustomError({ statusCode: 500, message: "Failed to create channel", errorField: "channel" });
       }
-      if (createdChannel.type === "chatroom" && createdChannel._id) {
+      if (
+        (createdChannel.type === "chatroom" || createdChannel.type === "voiceroom") &&
+        createdChannel._id
+      ) {
         const cid = createdChannel._id.toString();
         const existingChat = await this.chatRepository.findChatById(cid);
         if (!existingChat) {

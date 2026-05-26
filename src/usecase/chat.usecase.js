@@ -16,6 +16,7 @@ exports.ChatUseCase = void 0;
 const mongoose_1 = require("mongoose");
 const chatMediaUrl_1 = require("../framework/utils/chatMediaUrl");
 const chatMessageContent_1 = require("../framework/utils/chatMessageContent");
+const callMessageContent_1 = require("../framework/utils/callMessageContent");
 const linkPreview_1 = require("../framework/utils/linkPreview");
 const user_model_1 = __importDefault(require("../framework/models/user.model"));
 const DIRECT_CHAT_REGEX = /^([a-fA-F0-9]{24})_([a-fA-F0-9]{24})$/;
@@ -202,6 +203,9 @@ class ChatUseCase {
             else if (type === "poll") {
                 const poll = (0, chatMessageContent_1.parsePollContent)(content);
                 resolvedContent = (0, chatMessageContent_1.buildPollContent)(poll);
+            }
+            else if (type === "call") {
+                (0, callMessageContent_1.parseCallMessageContent)(content);
             }
             else if (type === "text") {
                 const url = (0, linkPreview_1.extractFirstHttpUrl)(content);

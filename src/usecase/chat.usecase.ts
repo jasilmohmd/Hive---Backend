@@ -33,6 +33,10 @@ import Users from "../framework/models/user.model";
 
 const DIRECT_CHAT_REGEX = /^([a-fA-F0-9]{24})_([a-fA-F0-9]{24})$/;
 
+function channelSupportsTextChat(type: string): boolean {
+  return type === "chatroom" || type === "voiceroom";
+}
+
 function communityObjectId(channel: IChannel): Types.ObjectId {
   const c = channel.communityId as unknown;
   if (c instanceof Types.ObjectId) return c;
@@ -83,7 +87,7 @@ export class ChatUseCase implements IChatUseCase {
 
     const channelId = new Types.ObjectId(chat.chatId);
     const channel = await this.channelRepository.getChannelById(channelId);
-    if (!channel || channel.type !== "chatroom") {
+    if (!channel || !channelSupportsTextChat(channel.type)) {
       throw new Error("Invalid channel chat");
     }
     if (!(await this.userHasChannelAccess(userId, channel))) {
@@ -130,7 +134,7 @@ export class ChatUseCase implements IChatUseCase {
     if (!channel) {
       throw new Error("Chat does not exist");
     }
-    if (channel.type !== "chatroom") {
+    if (!channelSupportsTextChat(channel.type)) {
       throw new Error("This channel does not support text chat");
     }
     if (!(await this.userHasChannelAccess(senderId, channel))) {
@@ -338,7 +342,7 @@ export class ChatUseCase implements IChatUseCase {
       } else if (Types.ObjectId.isValid(chatId)) {
         const channelId = new Types.ObjectId(chatId);
         const channel = await this.channelRepository.getChannelById(channelId);
-        if (!channel || channel.type !== "chatroom") {
+        if (!channel || !channelSupportsTextChat(channel.type)) {
           throw new Error("Chat does not exist");
         }
         if (!(await this.userHasChannelAccess(userOid, channel))) {
