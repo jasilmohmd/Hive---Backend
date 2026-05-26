@@ -154,12 +154,15 @@ import channelRouter from "../router/channel.router";
 import roleRouter from "../router/role.router";
 import imageRouter from "../router/image.router";
 import chatRouter from "../router/chat.router";
+import callRouter from "../router/call.router";
+import voiceroomRouter from "../router/voiceroom.router";
 import { createServer } from "http";
 import { Types } from "mongoose";
 import JWTService from "../utils/jwt.service";
 import { extractSocketToken } from "../utils/socketAuth.util";
 import { createChatUseCase } from "../chatDependencies";
 import { registerCallSignaling } from "../utils/callSignaling";
+import { registerVoiceroomPresence } from "../utils/voiceroomPresence";
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true });
@@ -173,6 +176,8 @@ app.use("/channel", channelRouter); // channel router
 app.use("/role", roleRouter); // role router
 app.use("/image", imageRouter); // image router
 app.use("/chat", chatRouter);
+app.use("/call", callRouter);
+app.use("/voiceroom", voiceroomRouter);
 
 // Error-handling middleware should be the last middleware
 app.use(errorHandlerMiddleware);
@@ -227,6 +232,7 @@ io.engine.on("connection_error", (err: { message?: string; context?: unknown }) 
 });
 
 registerCallSignaling(io, chatUseCase);
+registerVoiceroomPresence(io);
 
 io.on("connection", (socket) => {
   const connectedUserId = socket.data.userId as string | undefined;

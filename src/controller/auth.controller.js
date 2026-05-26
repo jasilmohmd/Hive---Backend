@@ -67,7 +67,8 @@ class AuthController {
                 res.cookie('token', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    maxAge: 1 * 24 * 60 * 60 * 1000
+                    sameSite: 'lax',
+                    maxAge: 1 * 24 * 60 * 60 * 1000,
                 });
                 res.status(statusCodes_1.default.Success).json({
                     message: successMessage_1.default.REGISTERTATION_SUCCESS,
@@ -90,7 +91,8 @@ class AuthController {
                 res.cookie('token', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    maxAge: 1 * 24 * 60 * 60 * 1000
+                    sameSite: 'lax',
+                    maxAge: 1 * 24 * 60 * 60 * 1000,
                 });
                 res.status(statusCodes_1.default.Success).json({
                     message: successMessage_1.default.LOGIN_SUCCESS,
@@ -144,10 +146,12 @@ class AuthController {
             }
         });
     }
+    /** Returns JWT for Socket.IO (httpOnly cookie → JSON for sessionStorage). */
     getRealtimeToken(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
-                const token = req.cookies?.token;
+                const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.token;
                 if (!token) {
                     throw new validationError_error_1.default({
                         statusCode: statusCodes_1.default.Unauthorized,
