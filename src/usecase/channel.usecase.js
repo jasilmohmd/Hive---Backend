@@ -44,7 +44,8 @@ class ChannelUseCase {
                 if (!createdChannel) {
                     throw new customError_error_1.CustomError({ statusCode: 500, message: "Failed to create channel", errorField: "channel" });
                 }
-                if (createdChannel.type === "chatroom" && createdChannel._id) {
+                if ((createdChannel.type === "chatroom" || createdChannel.type === "voiceroom") &&
+                    createdChannel._id) {
                     const cid = createdChannel._id.toString();
                     const existingChat = yield this.chatRepository.findChatById(cid);
                     if (!existingChat) {

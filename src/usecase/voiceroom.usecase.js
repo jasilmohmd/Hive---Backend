@@ -13,8 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoiceroomUseCase = void 0;
-const livekitSdk_1 = require("../framework/utils/livekitSdk.js");
 const channelAccess_util_1 = require("../framework/utils/channelAccess.util");
+const livekitSdk_js_1 = require("../framework/utils/livekitSdk.js");
+const voiceroomPresence_1 = require("../framework/utils/voiceroomPresence");
 const user_model_1 = __importDefault(require("../framework/models/user.model"));
 function livekitApiHost() {
     var _a, _b;
@@ -38,7 +39,7 @@ class VoiceroomUseCase {
                 throw new Error("LiveKit is not configured on the server");
             }
             const { maxParticipants } = yield (0, channelAccess_util_1.assertVoiceroomChannelAccess)(userId, channelId, this.channelRepository, this.communityRepository);
-            const { AccessToken, RoomServiceClient } = yield (0, livekitSdk_1.loadLiveKitSdk)();
+            const { AccessToken, RoomServiceClient } = yield (0, livekitSdk_js_1.loadLiveKitSdk)();
             const host = livekitApiHost();
             const roomService = new RoomServiceClient(host, apiKey, apiSecret);
             try {
@@ -76,6 +77,15 @@ class VoiceroomUseCase {
             return {
                 token: yield at.toJwt(),
                 livekitUrl,
+                maxParticipants,
+            };
+        });
+    }
+    getPresence(userId, channelId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { maxParticipants } = yield (0, channelAccess_util_1.assertVoiceroomChannelAccess)(userId, channelId, this.channelRepository, this.communityRepository);
+            return {
+                participants: (0, voiceroomPresence_1.getChannelPresenceList)(channelId),
                 maxParticipants,
             };
         });

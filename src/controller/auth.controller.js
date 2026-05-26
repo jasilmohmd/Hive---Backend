@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const statusCodes_1 = __importDefault(require("../constants/auth/statusCodes"));
 const successMessage_1 = __importDefault(require("../constants/auth/successMessage"));
@@ -19,6 +20,9 @@ const errorCode_1 = require("../constants/auth/errorCode");
 const validationError_error_1 = __importDefault(require("../errors/validationError.error"));
 const errorMessage_1 = __importDefault(require("../constants/auth/errorMessage"));
 const mongoose_1 = require("mongoose");
+const isProd = process.env.NODE_ENV === "production";
+const authCookieSameSite = (((_a = process.env.COOKIE_SAME_SITE) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) ||
+    (isProd ? "none" : "lax"));
 class AuthController {
     constructor(authUsecase) {
         this.authUsecase = authUsecase;
@@ -66,8 +70,8 @@ class AuthController {
                 const token = yield this.authUsecase.handleUserRegister(registerationCredentials);
                 res.cookie('token', token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'lax',
+                    secure: isProd,
+                    sameSite: authCookieSameSite,
                     maxAge: 1 * 24 * 60 * 60 * 1000,
                 });
                 res.status(statusCodes_1.default.Success).json({
@@ -90,8 +94,8 @@ class AuthController {
                 const token = yield this.authUsecase.handleUserLogin(loginCredentials);
                 res.cookie('token', token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'lax',
+                    secure: isProd,
+                    sameSite: authCookieSameSite,
                     maxAge: 1 * 24 * 60 * 60 * 1000,
                 });
                 res.status(statusCodes_1.default.Success).json({
@@ -120,7 +124,8 @@ class AuthController {
                 // 🔹 Clear the authentication token
                 res.clearCookie("token", {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
+                    secure: isProd,
+                    sameSite: authCookieSameSite,
                 });
                 res.status(statusCodes_1.default.Success).json({
                     message: successMessage_1.default.LOGOUT_SUCCESS,

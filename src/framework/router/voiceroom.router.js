@@ -16,5 +16,6 @@ const authMiddleware = new auth_middleware_1.default(jwtService);
 const voiceroomUseCase = new voiceroom_usecase_1.VoiceroomUseCase(new channel_repository_1.ChannelRepository(), new community_repository_1.CommunityRepository());
 const voiceroomController = new voiceroom_controller_1.VoiceroomController(voiceroomUseCase);
 voiceroomRouter.use(authMiddleware.isAuthenticated.bind(authMiddleware));
+voiceroomRouter.get("/:channelId/presence", voiceroomController.getPresence.bind(voiceroomController));
 voiceroomRouter.post("/:channelId/token", voiceroomController.getToken.bind(voiceroomController));
 exports.default = voiceroomRouter;
